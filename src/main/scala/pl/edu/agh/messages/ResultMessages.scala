@@ -1,5 +1,5 @@
 package pl.edu.agh.messages
 
-sealed trait ResultMessage
+sealed trait RMessage
 
-case class IntResultMessage(res: Int) extends ResultMessage
+case class ResultMessage[T](res: T) extends RMessage

@@ -1,5 +1,5 @@
 package pl.edu.agh.messages
 
-sealed trait DataMessage
+sealed trait DMessage
 
-case class IntDataMessage(number: Int) extends DataMessage
+case class DataMessage[T](data: T) extends DMessage

@@ -9,11 +9,11 @@ class SynchronizationPattern extends Actor with ActorLogging {
   var sum = 0
 
   def receive = {
-    case IntDataMessage(num) =>
-      sum += num
+    case DataMessage(data: Int) =>
+      sum += data
     case Dest(out) =>
       log.info("Sending result: {}", sum)
-      out ! IntResultMessage(sum)
+      out ! ResultMessage(sum)
   }
 }
 

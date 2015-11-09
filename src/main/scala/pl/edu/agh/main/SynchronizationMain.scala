@@ -17,7 +17,7 @@ object SynchronizationMain extends App {
   val in1 = InChannel(IntDataMessage(2))
   val in2 = InChannel(IntDataMessage(3))
   val A1 = SynchronizationPattern(system, name = "A1")
-  val out = OutChannel(system)
+  val out = OutChannel(system, name = "out")
 
   (in1, in2) ~> A1 ~> out
 

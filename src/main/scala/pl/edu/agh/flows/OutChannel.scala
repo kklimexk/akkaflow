@@ -12,13 +12,7 @@ class OutChannel extends Actor {
 }
 
 object OutChannel {
-  var name = "out"
   val props = Props[OutChannel]
 
-  def apply(system: ActorSystem) = system.actorOf(OutChannel.props, name)
-}
-
-trait OutChannelHandler { actor: Actor =>
-  private val actorSystem = actor.context.system
-  val out = actorSystem.actorSelection(actorSystem + "/user/" + OutChannel.name)
+  def apply(system: ActorSystem, name: String) = system.actorOf(OutChannel.props, name)
 }

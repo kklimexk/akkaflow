@@ -2,7 +2,7 @@ package pl.edu.agh.dsl
 
 import akka.actor.ActorRef
 import pl.edu.agh.flows.InChannel
-import pl.edu.agh.messages.Result
+import pl.edu.agh.messages.Dest
 
 object WorkFlowDsl {
   implicit class TwoInChannels(channels: (InChannel, InChannel)) {
@@ -14,7 +14,7 @@ object WorkFlowDsl {
   }
   implicit class ActorSendResult(flow: ActorRef) {
     def ~>(out: ActorRef) = {
-      flow ! Result
+      flow ! Dest(out)
     }
   }
 }

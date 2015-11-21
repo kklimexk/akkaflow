@@ -3,7 +3,8 @@ package pl.edu.agh.workflow_patterns.synchronization
 import akka.actor.{ActorLogging, ActorSystem, Props, Actor}
 import pl.edu.agh.messages._
 
-class SynchronizationPattern extends Actor with ActorLogging {
+//Synchronization Pattern
+class Sync extends Actor with ActorLogging {
 
   //val messagesQueue = mutable.Queue.empty[DataMessage]
   var sum = 0
@@ -17,7 +18,7 @@ class SynchronizationPattern extends Actor with ActorLogging {
   }
 }
 
-object SynchronizationPattern {
-  def apply(system: ActorSystem, name: String) = system.actorOf(SynchronizationPattern.props, name)
-  def props = Props[SynchronizationPattern]
+object Sync {
+  def apply(system: ActorSystem, name: String) = system.actorOf(Sync.props, name)
+  def props = Props[Sync]
 }

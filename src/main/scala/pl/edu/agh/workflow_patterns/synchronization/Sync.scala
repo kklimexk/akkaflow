@@ -7,18 +7,23 @@ import pl.edu.agh.messages._
 class Sync extends Actor with ActorLogging {
 
   //val messagesQueue = mutable.Queue.empty[DataMessage]
-  var sum = 0
+  var sqr = 1
+  var out = List.empty[Int]
 
   def receive = {
     case DataMessage(data: Int) =>
-      sum += data
-    case Dest(out) =>
-      log.info("Sending result: {}", sum)
-      out ! ResultMessage(sum)
+      sqr = data * data
+      log.info("Computing action: {}", sqr)
+      out :+= sqr
+    case Dest(flow) =>
+      log.info("Sending result: {}", sqr)
+      flow ! ResultMessage(sqr)
+    case Get =>
+      sender ! this
   }
 }
 
 object Sync {
-  def apply(system: ActorSystem, name: String) = system.actorOf(Sync.props, name)
+  def apply(name: String)(implicit system: ActorSystem) = system.actorOf(Sync.props, name)
   def props = Props[Sync]
 }

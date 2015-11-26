@@ -14,5 +14,5 @@ class OutChannel extends Actor {
 object OutChannel {
   val props = Props[OutChannel]
 
-  def apply(system: ActorSystem, name: String) = system.actorOf(OutChannel.props, name)
+  def apply(name: String)(implicit system: ActorSystem) = system.actorOf(OutChannel.props, name)
 }

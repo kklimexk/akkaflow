@@ -1,5 +1,6 @@
 package pl.edu.agh.main
 
+import pl.edu.agh.actions.Action
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.Source
 import pl.edu.agh.utils.ActorUtils._
@@ -12,8 +13,16 @@ object SynchronizationMain extends App {
 
   //val in1 = InChannel(DataMessage(2))
   //val in2 = InChannel(DataMessage(3))
-  val sqrProc = Sync(name = "sqrProc")
-  val sumProc = Sync(name = "sumProc")
+  val sqr = Action[Int] {
+    in => in * in
+  }
+
+  val sum = Action[List[Int]] {
+    in => in.reduceLeft[Int](_+_)
+  }
+
+  val sqrProc = Sync(name = "sqrProc", sqr)
+  val sumProc = Sync(name = "sumProc", sum)
 
   Source(1 to 6) ~> sqrProc
   println(sqrProc.out)

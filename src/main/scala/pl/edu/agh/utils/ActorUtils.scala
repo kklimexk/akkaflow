@@ -15,9 +15,9 @@ object ActorUtils {
   implicit val timeout = Timeout(5 seconds)
 
   implicit class ConverterToActor(actorRef: ActorRef) {
-    def toSync: Sync = {
+    def toSync[T]: Sync[T] = {
       val actorF = actorRef ? Get
-      val res = Await.result(actorF, timeout.duration).asInstanceOf[Sync]
+      val res = Await.result(actorF, timeout.duration).asInstanceOf[Sync[T]]
       res
     }
     def out: List[Int] = {

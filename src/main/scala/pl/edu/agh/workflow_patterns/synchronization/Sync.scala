@@ -6,18 +6,19 @@ import pl.edu.agh.messages._
 //Synchronization Pattern
 class Sync extends Actor with ActorLogging {
 
-  //val messagesQueue = mutable.Queue.empty[DataMessage]
   var sqr = 1
+  var sum = 0
   var out = List.empty[Int]
 
   def receive = {
     case DataMessage(data: Int) =>
       sqr = data * data
-      log.info("Computing action: {}", sqr)
+      log.info("Computing sqr action: {}", sqr)
       out :+= sqr
-    case Dest(flow) =>
-      log.info("Sending result: {}", sqr)
-      flow ! ResultMessage(sqr)
+    case DataMessage(data: List[Int]) =>
+      sum = data.reduceLeft[Int](_+_)
+      log.info("Computing sum action: {}", sum)
+      out :+= sum
     case Get =>
       sender ! this
   }

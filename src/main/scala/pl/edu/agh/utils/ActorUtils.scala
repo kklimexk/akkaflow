@@ -1,6 +1,6 @@
 package pl.edu.agh.utils
 
-import akka.actor.ActorRef
+import akka.actor.{ActorSystem, ActorRef}
 import akka.util.Timeout
 import akka.pattern.ask
 
@@ -11,6 +11,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object ActorUtils {
+  implicit val system = ActorSystem("ActorSystem")
   implicit val timeout = Timeout(5 seconds)
 
   implicit class ConverterToActor(actorRef: ActorRef) {

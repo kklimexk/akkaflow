@@ -4,6 +4,7 @@ import akka.actor.ActorRef
 import pl.edu.agh.actions.Action
 import pl.edu.agh.flows.Source
 import pl.edu.agh.messages.DataMessage
+import pl.edu.agh.workflow.Workflow
 
 object WorkFlowDsl {
   /*implicit class TwoInChannels(channels: (InChannel, InChannel)) {
@@ -26,6 +27,11 @@ object WorkFlowDsl {
       }
       flow
     }
+    def ~>(workflow: Workflow) = {
+      source.data.foreach { d =>
+        workflow.in :+= d
+      }
+    }
   }
   implicit class ForwardIteratorDataToNext(data: Iterator[List[Int]]) {
     def ~>(flow: ActorRef) = {
@@ -35,7 +41,15 @@ object WorkFlowDsl {
       flow
     }
   }
-  implicit class ForwardListDataToNext(data: List[List[Int]]) {
+  implicit class ForwardListDataToNext(data: List[Int]) {
+    def ~>>(flow: ActorRef) = {
+      data.foreach { d =>
+        flow ! DataMessage(d)
+      }
+      flow
+    }
+  }
+  implicit class ForwardListOfListsDataToNext(data: List[List[Int]]) {
     def ~>(flow: ActorRef) = {
       data.foreach { d =>
         flow ! DataMessage(d)

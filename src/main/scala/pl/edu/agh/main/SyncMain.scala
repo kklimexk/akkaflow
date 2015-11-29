@@ -4,15 +4,13 @@ import pl.edu.agh.actions.Action
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.Source
 import pl.edu.agh.utils.ActorUtils._
-import pl.edu.agh.workflow_patterns.synchronization.Sync
+import pl.edu.agh.workflow_patterns.synchronization._
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object SynchronizationMain extends App {
+object SyncMain extends App {
 
-  //val in1 = InChannel(DataMessage(2))
-  //val in2 = InChannel(DataMessage(3))
   val sqr = Action[Int] {
     in => in * in
   }
@@ -21,8 +19,13 @@ object SynchronizationMain extends App {
     in => in.reduceLeft[Int](_+_)
   }
 
-  val sqrProc = Sync(name = "sqrProc", sqr)
-  val sumProc = Sync(name = "sumProc", sum)
+  val sqrProc = Sync[Int] {
+    send (sqr)
+  }
+
+  val sumProc = Sync[List[Int]] {
+    send (sum)
+  }
 
   Source(1 to 6) ~> sqrProc
   println(sqrProc.out)

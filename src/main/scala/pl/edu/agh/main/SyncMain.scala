@@ -4,6 +4,7 @@ import pl.edu.agh.actions.Action
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.Source
 import pl.edu.agh.utils.ActorUtils._
+import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.synchronization._
 
 import scala.concurrent.Await
@@ -27,9 +28,15 @@ object SyncMain extends App {
     send (sum)
   }
 
-  Source(1 to 6) ~> sqrProc
-  println(sqrProc.out)
-  sqrProc.out.grouped(3) ~> sumProc
-  println(sumProc.out)
+  def w = Workflow { () =>
+    Source(1 to 6) ~> sqrProc
+    //println(sqrProc.out)
+    sqrProc.out.grouped(3) ~> sumProc
+    sumProc.out
+  }
+
+  val res = w.run
+  println(res)
+
   Await.result(system.whenTerminated, Duration.Inf)
 }

@@ -7,9 +7,6 @@ import pl.edu.agh.utils.ActorUtils._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.synchronization._
 
-import scala.concurrent.Await
-import scala.concurrent.duration._
-
 object SyncMain extends App {
 
   val sqr = Action[Int] { in =>
@@ -38,5 +35,4 @@ object SyncMain extends App {
   val res = w.run
   println(res)
 
-  Await.result(system.whenTerminated, Duration.Inf)
 }

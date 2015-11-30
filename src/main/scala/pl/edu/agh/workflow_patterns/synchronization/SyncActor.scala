@@ -13,7 +13,7 @@ class SyncActor[T](action: Action[T]) extends Actor with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
       res = action.execute(data)
-      log.info("Computing action: {}", res)
+      //log.info("Computing action: {}", res)
       out :+= res
     case Get =>
       sender ! this

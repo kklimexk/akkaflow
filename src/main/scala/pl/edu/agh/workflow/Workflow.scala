@@ -1,8 +1,12 @@
 package pl.edu.agh.workflow
 
+import pl.edu.agh.utils.ActorUtils._
+
 class Workflow(name: String, block: => (List[Int], List[Int]) => List[Int]) extends AbstractWorkflow with Runnable {
   def run: List[Int] = {
-    block(in, out)
+    val res = block(in, out)
+    system.terminate
+    res
   }
 }
 

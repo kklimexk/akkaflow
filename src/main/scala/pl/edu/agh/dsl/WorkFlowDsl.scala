@@ -48,6 +48,13 @@ object WorkFlowDsl {
       }
       flow
     }
+    def ~>>(out: List[Int]) = {
+      var outRes = out
+      data.foreach { d =>
+        outRes :+= d
+      }
+      outRes
+    }
   }
   implicit class ForwardListOfListsDataToNext(data: List[List[Int]]) {
     def ~>(flow: ActorRef) = {

@@ -1,15 +1,11 @@
 package pl.edu.agh.workflow
 
-class Workflow(block: => () => List[Int]) {
-  var name: String = ""
-  var in = List.empty[Int]
-  var out = List.empty[Int]
-
-  def run = {
-    block()
+class Workflow(block: => (List[Int], List[Int]) => List[Int]) extends AbstractWorkflow with Runnable {
+  def run: List[Int] = {
+    block(in, out)
   }
 }
 
 object Workflow {
-  def apply(block: () => List[Int]) = new Workflow(block)
+  def apply(block: => (List[Int], List[Int]) => List[Int]) = new Workflow(block)
 }

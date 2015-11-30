@@ -12,29 +12,29 @@ import scala.concurrent.duration._
 
 object SyncMain extends App {
 
-  val sqr = Action[Int] {
-    in => in * in
+  val sqr = Action[Int] { in =>
+    in * in
   }
 
-  val sum = Action[List[Int]] {
-    in => in.reduceLeft[Int](_+_)
+  val sum = Action[List[Int]] { in =>
+    in.reduceLeft[Int](_+_)
   }
 
-  val sqrProc = Sync[Int] {
+  val sqrProc = Sync {
     send (sqr)
   }
 
-  val sumProc = Sync[List[Int]] {
+  val sumProc = Sync {
     send (sum)
   }
 
-  def w = Workflow { () =>
-    Source(1 to 6) ~> sqrProc
-    //println(sqrProc.out)
+  val w = Workflow { (in, out) =>
+    in ~>> sqrProc
     sqrProc.out.grouped(3) ~> sumProc
-    sumProc.out
+    sumProc.out ~>> out
   }
 
+  Source(1 to 6) ~> w
   val res = w.run
   println(res)
 

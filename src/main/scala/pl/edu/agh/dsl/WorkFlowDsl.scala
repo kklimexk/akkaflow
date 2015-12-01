@@ -7,19 +7,7 @@ import pl.edu.agh.messages.DataMessage
 import pl.edu.agh.workflow.Workflow
 
 object WorkFlowDsl {
-  /*implicit class TwoInChannels(channels: (InChannel, InChannel)) {
-    def ~>(actor: ActorRef) = {
-      channels._1 ~> actor
-      channels._2 ~> actor
-      actor
-    }
-  }*/
-  /*implicit class ActorToActor(flow: ActorRef) {
-    def ~>(flowNext: ActorRef) = {
-      flow ! Dest(flowNext)
-      flowNext
-    }
-  }*/
+
   implicit class InputData(source: Source) {
     def ~>(flow: ActorRef) = {
       source.data.foreach { d =>

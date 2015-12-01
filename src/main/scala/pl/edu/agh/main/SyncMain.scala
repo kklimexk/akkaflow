@@ -19,10 +19,12 @@ object SyncMain extends App {
 
   val sqrProc = Sync {
     send (sqr)
+    //Send -> Action[Int](in => in * in)  //lub tak ze moze byc
   }
 
   val sumProc = Sync {
     send (sum)
+    //Send -> sum //lub tak tez moze byc
   }
 
   val w = Workflow { (in, out) =>

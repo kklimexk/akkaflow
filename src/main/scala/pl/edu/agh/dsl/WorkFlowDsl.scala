@@ -1,7 +1,7 @@
 package pl.edu.agh.dsl
 
 import akka.actor.ActorRef
-import pl.edu.agh.actions.{Acceptable, Action}
+import pl.edu.agh.actions.Action
 import pl.edu.agh.flows.Source
 import pl.edu.agh.messages.DataMessage
 import pl.edu.agh.workflow.Workflow

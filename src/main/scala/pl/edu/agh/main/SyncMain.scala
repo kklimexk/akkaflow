@@ -27,14 +27,18 @@ object SyncMain extends App {
     //Send -> sum //lub tak tez moze byc
   }
 
-  val w = Workflow { (in, out) =>
-    in ~>> sqrProc
-    sqrProc.out.grouped(3) ~> sumProc
-    sumProc.out ~>> out
-  }
+  val w = Workflow (
+    "Sum of Squares workflow",
+    (in, out) => {
+      in ~>> sqrProc
+      sqrProc.out.grouped(3) ~> sumProc
+      sumProc.out ~>> out
+    }
+  )
 
   Source(1 to 6) ~> w
   val res = w.run
   println(res)
+  println(w)
 
 }

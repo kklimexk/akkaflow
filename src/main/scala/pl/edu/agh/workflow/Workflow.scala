@@ -1,9 +1,10 @@
 package pl.edu.agh.workflow
 
+import pl.edu.agh.flows.{In, Out}
 import pl.edu.agh.utils.ActorUtils._
 
-class Workflow(name: String, block: => (List[Int], List[Int]) => List[Int]) extends AbstractWorkflow(name) with Runnable {
-  def run: List[Int] = {
+class Workflow(name: String, block: => (In, Out) => Out) extends AbstractWorkflow(name) with Runnable {
+  def run: Out = {
     out = block(in, out)
     system.terminate
     out
@@ -11,6 +12,6 @@ class Workflow(name: String, block: => (List[Int], List[Int]) => List[Int]) exte
 }
 
 object Workflow {
-  def apply(block: => (List[Int], List[Int]) => List[Int]) = new Workflow("", block)
-  def apply(name: String, block: => (List[Int], List[Int]) => List[Int]) = new Workflow(name, block)
+  def apply(block: => (In, Out) => Out) = new Workflow("", block)
+  def apply(name: String, block: => (In, Out) => Out) = new Workflow(name, block)
 }

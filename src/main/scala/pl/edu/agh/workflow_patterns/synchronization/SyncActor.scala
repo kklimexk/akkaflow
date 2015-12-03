@@ -1,6 +1,6 @@
 package pl.edu.agh.workflow_patterns.synchronization
 
-import akka.actor.{ActorLogging, ActorSystem, Props, Actor}
+import akka.actor.{ActorLogging, Props, Actor}
 import pl.edu.agh.actions.Action
 import pl.edu.agh.messages._
 
@@ -21,7 +21,9 @@ class SyncActor[T](action: Action[T]) extends Actor with ActorLogging {
 }
 
 object SyncActor {
-  def apply[T](action: Action[T])(implicit system: ActorSystem) = system.actorOf(SyncActor.props(action))
-  def apply[T](name: String, action: Action[T])(implicit system: ActorSystem) = system.actorOf(SyncActor.props(action), name)
+  import pl.edu.agh.utils.ActorUtils.system
+
+  def apply[T](action: Action[T]) = system.actorOf(SyncActor.props(action))
+  def apply[T](name: String, action: Action[T]) = system.actorOf(SyncActor.props(action), name)
   def props[T](action: Action[T]) = Props(classOf[SyncActor[T]], action)
 }

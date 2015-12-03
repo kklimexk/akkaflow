@@ -1,20 +1,14 @@
 package pl.edu.agh.dsl
 
-import akka.actor.ActorRef
 import pl.edu.agh.actions.Action
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.messages.DataMessage
 import pl.edu.agh.workflow.Workflow
+import pl.edu.agh.workflow_patterns.synchronization.Sync
 
 object WorkFlowDsl {
 
-  implicit class InputData(source: Source) {
-    def ~>(flow: ActorRef) = {
-      source.data.foreach { d =>
-        flow ! DataMessage(d)
-      }
-      flow
-    }
+  implicit class InputDataToWorkflow(source: Source) {
     def ~>(workflow: Workflow) = {
       source.data.foreach { d =>
         workflow.in.data :+= d
@@ -22,25 +16,16 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ForwardIteratorDataToNext(data: Iterator[List[Int]]) {
-    def ~>(flow: ActorRef) = {
-      data.toList.foreach { d =>
-        flow ! DataMessage(d)
-      }
-      flow
-    }
-  }
-
-  implicit class ForwardInputDataToNext(in: In) {
-    def ~>>(flow: ActorRef) = {
+  implicit class InputDataToNext(in: In) {
+    def ~>>[T](elem: Sync[T]) = {
       in.data.foreach { d =>
-        flow ! DataMessage(d)
+        elem.syncActor ! DataMessage(d)
       }
-      flow
+      elem
     }
   }
 
-  implicit class ForwardResultToOutput(data: List[Int]) {
+  implicit class ResultToOutput(data: List[Int]) {
     def ~>>(out: Out) = {
       var outRes = out.result
       data.foreach { d =>
@@ -51,12 +36,21 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ForwardListOfListsDataToNext(data: List[List[Int]]) {
-    def ~>(flow: ActorRef) = {
-      data.foreach { d =>
-        flow ! DataMessage(d)
+  implicit class ForwardIteratorDataToNext(data: Iterator[List[Int]]) {
+    def ~>[T](elem: Sync[T]) = {
+      data.toList.foreach { d =>
+        elem.syncActor ! DataMessage(d)
       }
-      flow
+      elem
+    }
+  }
+
+  implicit class ForwardListOfListsDataToNext(data: List[List[Int]]) {
+    def ~>[T](elem: Sync[T]) = {
+      data.foreach { d =>
+        elem.syncActor ! DataMessage(d)
+      }
+      elem
     }
   }
 

@@ -1,17 +1,21 @@
 package pl.edu.agh.dsl
 
-import pl.edu.agh.actions.Action
+import pl.edu.agh.actions.{MultipleAction, Action}
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.messages.DataMessage
-import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns.synchronization.Sync
+import pl.edu.agh.workflow_patterns.synchronization.{MultipleSync, Sync}
 
 object WorkFlowDsl {
 
   implicit class InputDataToWorkflow(source: Source) {
-    def ~>(workflow: Workflow) = {
+    /*def ~>(workflow: Workflow) = {
       source.data.foreach { d =>
         workflow.in.data :+= d
+      }
+    }*/
+    def ~>(in: In) = {
+      source.data.foreach { d =>
+        in.data :+= d
       }
     }
   }
@@ -20,6 +24,16 @@ object WorkFlowDsl {
     def ~>>[T](elem: Sync[T]) = {
       in.data.foreach { d =>
         elem.syncActor ! DataMessage(d)
+      }
+      elem
+    }
+  }
+
+  implicit class TwoInputsDataToNext(ins: (In, In)) {
+    def ~>>[T](elem: MultipleSync[T]) = {
+      (ins._1.data zip ins._2.data).foreach { case (d1, d2) =>
+        elem.syncActor ! DataMessage(d1)
+        elem.syncActor ! DataMessage(d2)
       }
       elem
     }
@@ -58,8 +72,12 @@ object WorkFlowDsl {
     def ->[T](action: Action[T]) = {
       action
     }
+    def ->[T](action: MultipleAction[T]) = {
+      action
+    }
   }
 
   def send[T](action: Action[T]) = action
+  def send[T](action: MultipleAction[T]) = action
 
 }

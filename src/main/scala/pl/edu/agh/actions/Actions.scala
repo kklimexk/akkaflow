@@ -1,16 +1,24 @@
 package pl.edu.agh.actions
 
-abstract class IAction[T: Acceptable]
+abstract class IAction[T: Acceptable] {
+  def execute(ins: T*): Int
+}
 
 case class Action[T: Acceptable](action: T => Int) extends IAction[T] {
-  def execute(in: T): Int = {
-    action(in)
+  def execute(ins: T*): Int = {
+    action(ins(0))
   }
 }
 
 case class Action2[T: Acceptable](action: (T, T) => Int) extends IAction[T] {
-  def execute(in1: T, in2: T): Int = {
-    action(in1, in2)
+  def execute(ins: T*): Int = {
+    action(ins(0), ins(1))
+  }
+}
+
+case class Action3[T: Acceptable](action: (T, T, T) => Int) extends IAction[T] {
+  def execute(ins: T*): Int = {
+    action(ins(0), ins(1), ins(2))
   }
 }
 

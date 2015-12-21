@@ -1,6 +1,6 @@
 package pl.edu.agh.dsl
 
-import pl.edu.agh.actions.{Action2, Action}
+import pl.edu.agh.actions._
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.messages.DataMessage
 import pl.edu.agh.workflow_patterns.synchronization.{MultipleSync, Sync}
@@ -69,15 +69,15 @@ object WorkFlowDsl {
   }
 
   implicit object Send {
-    def ->[T](action: Action[T]) = {
+    def ->[T](action: ISingleAction[T]) = {
       action
     }
-    def ->[T](action: Action2[T]) = {
+    def ->[T](action: IMultipleAction[T]) = {
       action
     }
   }
 
-  def send[T](action: Action[T]) = action
-  def send[T](action: Action2[T]) = action
+  def send[T](action: ISingleAction[T]) = action
+  def send[T](action: IMultipleAction[T]) = action
 
 }

@@ -3,26 +3,28 @@ package pl.edu.agh.actions
 abstract class IAction[T: Acceptable] {
   def execute(ins: T*): Int
 }
+abstract class ISingleAction[T: Acceptable] extends IAction[T]
+abstract class IMultipleAction[T: Acceptable] extends IAction[T]
 
-case class Action[T: Acceptable](action: T => Int) extends IAction[T] {
+case class Action[T: Acceptable](action: T => Int) extends ISingleAction[T] {
   def execute(ins: T*): Int = {
     action(ins(0))
   }
 }
 
-case class Action2[T: Acceptable](action: (T, T) => Int) extends IAction[T] {
+case class Action2[T: Acceptable](action: (T, T) => Int) extends IMultipleAction[T] {
   def execute(ins: T*): Int = {
     action(ins(0), ins(1))
   }
 }
 
-case class Action3[T: Acceptable](action: (T, T, T) => Int) extends IAction[T] {
+case class Action3[T: Acceptable](action: (T, T, T) => Int) extends IMultipleAction[T] {
   def execute(ins: T*): Int = {
     action(ins(0), ins(1), ins(2))
   }
 }
 
-case class MultipleAction[T: Acceptable](action: Seq[T] => Int) extends IAction[T] {
+case class MultipleAction[T: Acceptable](action: Seq[T] => Int) extends IMultipleAction[T] {
   def execute(ins: T*): Int = {
     action(ins)
   }

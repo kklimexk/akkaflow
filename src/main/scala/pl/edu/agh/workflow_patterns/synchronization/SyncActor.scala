@@ -1,12 +1,12 @@
 package pl.edu.agh.workflow_patterns.synchronization
 
 import akka.actor.{ActorLogging, Props, Actor}
-import pl.edu.agh.actions.Action
+import pl.edu.agh.actions.ISingleAction
 import pl.edu.agh.messages._
 import pl.edu.agh.workflow_patterns.WorkflowProcess
 
 //Synchronization Pattern
-class SyncActor[T](action: Action[T]) extends Actor with WorkflowProcess with ActorLogging {
+class SyncActor[T](action: ISingleAction[T]) extends Actor with WorkflowProcess with ActorLogging {
 
   def receive = {
     case DataMessage(data: T) =>
@@ -21,7 +21,7 @@ class SyncActor[T](action: Action[T]) extends Actor with WorkflowProcess with Ac
 object SyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T](action: Action[T]) = system.actorOf(SyncActor.props(action))
-  def apply[T](name: String, action: Action[T]) = system.actorOf(SyncActor.props(action), name)
-  def props[T](action: Action[T]) = Props(classOf[SyncActor[T]], action)
+  def apply[T](action: ISingleAction[T]) = system.actorOf(SyncActor.props(action))
+  def apply[T](name: String, action: ISingleAction[T]) = system.actorOf(SyncActor.props(action), name)
+  def props[T](action: ISingleAction[T]) = Props(classOf[SyncActor[T]], action)
 }

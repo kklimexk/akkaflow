@@ -1,12 +1,12 @@
 package pl.edu.agh.workflow_patterns.synchronization
 
-import pl.edu.agh.actions.MultipleAction
+import pl.edu.agh.actions.Action2
 
 //Sync Pattern with multiple inputs
-class MultipleSync[T](action: MultipleAction[T]) {
+class MultipleSync[T](action: Action2[T]) {
   lazy val syncActor = MultipleSyncActor(action)
 }
 
 object MultipleSync {
-  def apply[T](action: MultipleAction[T]) = new MultipleSync[T](action)
+  def apply[T](action: Action2[T]) = new MultipleSync[T](action)
 }

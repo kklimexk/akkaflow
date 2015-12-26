@@ -11,3 +11,5 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
   "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 )
+
+libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.11.7"

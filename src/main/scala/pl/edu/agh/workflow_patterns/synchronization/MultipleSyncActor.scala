@@ -13,7 +13,7 @@ class MultipleSyncActor[T](multipleAction: IMultipleAction[T]) extends Actor wit
     case DataMessage(data: T) =>
       syncPoint :+= data
 
-      if (syncPoint.length == 2) {
+      if (syncPoint.length == multipleAction.numOfIns) {
         res = multipleAction.execute(syncPoint:_*)
         //log.info("Computing action: {}", res)
         out :+= res

@@ -6,6 +6,7 @@ import akka.pattern.ask
 
 import pl.edu.agh.messages.Get
 import pl.edu.agh.workflow_patterns.WorkflowProcess
+import pl.edu.agh.workflow_patterns.choice.{Choice, ChoiceActor}
 import pl.edu.agh.workflow_patterns.synchronization.{MultipleSync, MultipleSyncActor, Sync, SyncActor}
 
 import scala.concurrent.Await
@@ -32,12 +33,22 @@ object ActorUtils {
       Await.result(actorF, timeout.duration).asInstanceOf[MultipleSyncActor[T]]
     }
 
-    def out: List[Int] = {
+    def toChoiceActor[T]: ChoiceActor[T] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T]]
+    }
+
+    /*def out: List[Int] = {
       val actor = actorRef.toWorkflowProcess
       actor.out
-    }
+    }*/
+
+    /*def outs: List[List[Int]] = {
+      val actor = actorRef.toChoiceActor
+      List(actor.out1, actor.out2, actor.out3)
+    }*/
 
   }
   implicit def convertSyncToSyncActor[T](sync: Sync[T]): SyncActor[T] = sync.syncActor.toSyncActor
   implicit def convertMultipleSyncToMultipleSyncActor[T](mSync: MultipleSync[T]): MultipleSyncActor[T] = mSync.syncActor.toMultipleSyncActor
+  implicit def convertChoiceToChoiceActor[T](choice: Choice[T]): ChoiceActor[T] = choice.choiceActor.toChoiceActor
 }

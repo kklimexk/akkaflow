@@ -4,6 +4,7 @@ import pl.edu.agh.actions._
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.messages.DataMessage
 import pl.edu.agh.workflow_patterns.choice.Choice
+import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.synchronization.{MultipleSync, Sync}
 
 object WorkFlowDsl {
@@ -34,6 +35,12 @@ object WorkFlowDsl {
       }
       elem
     }
+    def ~>>[T](elem: Merge[T]) = {
+      in.data.foreach { d =>
+        elem.mergeActor ! DataMessage(d)
+      }
+      elem
+    }
   }
 
   implicit class TwoInputsDataToNext(ins: (In, In)) {
@@ -46,7 +53,13 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ResultToOutput(data: List[Int]) {
+  implicit class ResultToNext(data: List[Int]) {
+    def ~>[T](elem: Merge[T]) = {
+      data.foreach { d =>
+        elem.mergeActor ! DataMessage(d)
+      }
+      elem
+    }
     def ~>>(out: Out) = {
       var outRes = out.result
       data.foreach { d =>

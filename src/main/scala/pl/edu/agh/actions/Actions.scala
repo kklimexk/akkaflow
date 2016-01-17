@@ -31,6 +31,14 @@ case class Action3[T: Acceptable](action: (T, T, T) => Int) extends IMultipleAct
   }
 }
 
+case class Action4[T: Acceptable](action: (T, T, T, T) => Int) extends IMultipleAction[T] {
+  var numOfIns: Int = 4
+
+  def execute(ins: T*): Int = {
+    action(ins(0), ins(1), ins(2), ins(3))
+  }
+}
+
 case class MultipleAction[T: Acceptable](action: Seq[T] => Int) extends IMultipleAction[T] {
 
   /*TODO: Tutaj nie dziala ponizszy kod - nie wiadomo jak zcastowac reflect.runtime.universe.Type (head) na Seq[Int]

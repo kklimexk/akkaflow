@@ -7,7 +7,7 @@ class MergeActor[T] extends Actor with MergeProcess with ActorLogging {
   def receive = {
     case DataMessage(data: Int) =>
       //log.info("DATA: {}", data)
-      out :+= data
+      _out :+= data
     case Get =>
       sender ! this
   }

@@ -2,9 +2,9 @@ package pl.edu.agh.dsl
 
 import pl.edu.agh.actions._
 import pl.edu.agh.flows.{In, Out, Source}
-import pl.edu.agh.messages.DataMessage
+import pl.edu.agh.messages.{PropagateDataForMerge, DataMessage}
 import pl.edu.agh.workflow_patterns.choice.Choice
-import pl.edu.agh.workflow_patterns.merge.Merge
+import pl.edu.agh.workflow_patterns.merge.{PropagateDataForMergeActor, Merge}
 import pl.edu.agh.workflow_patterns.synchronization.{MultipleSync, Sync}
 
 object WorkFlowDsl {
@@ -55,10 +55,7 @@ object WorkFlowDsl {
 
   implicit class ResultToNext(data: List[Int]) {
     def ~>[T](elem: Merge[T]) = {
-      data.foreach { d =>
-        elem.mergeActor ! DataMessage(d)
-      }
-      elem
+      PropagateDataForMergeActor(data) ! PropagateDataForMerge(elem)
     }
     def ~>>(out: Out) = {
       var outRes = out.result

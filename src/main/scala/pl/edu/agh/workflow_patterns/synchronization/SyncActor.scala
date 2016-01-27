@@ -12,7 +12,7 @@ class SyncActor[T](action: ISingleAction[T]) extends Actor with WorkflowProcess 
     case DataMessage(data: T) =>
       res = action.execute(data)
       //log.info("Computing action: {}", res)
-      out :+= res
+      _out :+= res
     case Get =>
       sender ! this
   }

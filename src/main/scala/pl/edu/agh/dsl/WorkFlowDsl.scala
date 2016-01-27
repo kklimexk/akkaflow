@@ -2,10 +2,10 @@ package pl.edu.agh.dsl
 
 import pl.edu.agh.actions._
 import pl.edu.agh.flows.{In, Out, Source}
-import pl.edu.agh.messages.{PropagateDataForMerge, DataMessage}
+import pl.edu.agh.messages._
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.workflow_patterns.merge.{PropagateDataForMergeActor, Merge}
-import pl.edu.agh.workflow_patterns.synchronization.{MultipleSync, Sync}
+import pl.edu.agh.workflow_patterns.synchronization.{PropagateDataForMultipleSyncActor, MultipleSync, Sync}
 
 object WorkFlowDsl {
 
@@ -45,11 +45,13 @@ object WorkFlowDsl {
 
   implicit class TwoInputsDataToNext(ins: (In, In)) {
     def ~>>[T](elem: MultipleSync[T]) = {
-      (ins._1.data zip ins._2.data).foreach { case (d1, d2) =>
+      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync1(elem)
+      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync2(elem)
+      /*(ins._1.data zip ins._2.data).foreach { case (d1, d2) =>
         elem.syncActor ! DataMessage(d1)
         elem.syncActor ! DataMessage(d2)
       }
-      elem
+      elem*/
     }
   }
 

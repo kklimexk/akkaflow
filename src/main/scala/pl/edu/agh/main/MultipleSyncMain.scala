@@ -29,8 +29,7 @@ object MultipleSyncMain extends App {
     "Sum of two inputs and multiply every three of them",
     (ins, out) => {
       (ins(0), ins(1)) ~>> sumProc
-      sumProc.out.grouped(3) ~> mulProc
-      mulProc.out ~>> out
+      sumProc.out ~>> out
     }
   )
 

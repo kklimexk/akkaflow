@@ -1,6 +1,8 @@
 package pl.edu.agh.workflow_patterns.merge
 
-trait MergeProcess {
+import pl.edu.agh.workflow_patterns.WorkflowProcess
+
+trait MergeProcess extends WorkflowProcess {
   var _out = List.empty[Int]
   def out = {
     //TODO: To trzeba zmienic

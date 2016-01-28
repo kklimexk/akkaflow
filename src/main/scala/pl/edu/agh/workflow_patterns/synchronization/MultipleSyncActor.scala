@@ -5,9 +5,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import akka.actor.{Props, ActorLogging, Actor}
 import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.messages._
-import pl.edu.agh.workflow_patterns.WorkflowProcess
 
-class MultipleSyncActor[T](multipleAction: IMultipleAction[T]) extends Actor with WorkflowProcess with ActorLogging {
+class MultipleSyncActor[T](multipleAction: IMultipleAction[T]) extends Actor with SyncProcess with ActorLogging {
 
   //Ewentualnie mozna uzyc LinkedBlockingQueue
   var syncPoint1 = new ConcurrentLinkedQueue[T]()

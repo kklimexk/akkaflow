@@ -3,10 +3,9 @@ package pl.edu.agh.workflow_patterns.synchronization
 import akka.actor.{ActorLogging, Props, Actor}
 import pl.edu.agh.actions.ISingleAction
 import pl.edu.agh.messages._
-import pl.edu.agh.workflow_patterns.WorkflowProcess
 
 //Synchronization Pattern
-class SyncActor[T](action: ISingleAction[T]) extends Actor with WorkflowProcess with ActorLogging {
+class SyncActor[T](action: ISingleAction[T]) extends Actor with SyncProcess with ActorLogging {
 
   def receive = {
     case DataMessage(data: T) =>

@@ -4,5 +4,4 @@ sealed trait DMessage
 
 case class DataMessage[T](data: T) extends DMessage
 
-case class SyncDataMessage1[T](data: T) extends DMessage
-case class SyncDataMessage2[T](data: T) extends DMessage
+case class SyncDataMessage[T](data: T, uniqueId: Int) extends DMessage

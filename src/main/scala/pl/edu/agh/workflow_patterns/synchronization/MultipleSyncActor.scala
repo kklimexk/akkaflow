@@ -1,34 +1,39 @@
 package pl.edu.agh.workflow_patterns.synchronization
 
 import java.util.concurrent.ConcurrentLinkedQueue
+import scala.util.control.Breaks._
 
 import akka.actor.{Props, ActorLogging, Actor}
 import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.messages._
 
-class MultipleSyncActor[T](multipleAction: IMultipleAction[T]) extends Actor with SyncProcess with ActorLogging {
-
-  //Ewentualnie mozna uzyc LinkedBlockingQueue
-  var syncPoint1 = new ConcurrentLinkedQueue[T]()
-  var syncPoint2 = new ConcurrentLinkedQueue[T]()
+class MultipleSyncActor[T](multipleAction: IMultipleAction[T], syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends Actor with SyncProcess with ActorLogging {
 
   def receive = {
-    case SyncDataMessage1(data: T) =>
-      syncPoint1.offer(data)
-      self ! GetResult
-
-    case SyncDataMessage2(data: T) =>
-      syncPoint2.offer(data)
+    case SyncDataMessage(data: T, uId) =>
+      syncPoints(uId).offer(data)
       self ! GetResult
 
     case GetResult =>
-      val el1 = syncPoint1.peek()
-      val el2 = syncPoint2.peek()
 
-      if (el1 != null && el2 != null) {
-        res = multipleAction.execute(el1, el2)
-        syncPoint1.poll()
-        syncPoint2.poll()
+      var canExecuteAction = true
+
+      breakable {
+        for (q <- syncPoints) {
+          val el = q.peek()
+          if (el == null) {
+            canExecuteAction = false
+            break
+          }
+        }
+      }
+
+      if (canExecuteAction) {
+        var sync = Seq.empty[T]
+        syncPoints.foreach { q =>
+          sync :+= q.poll()
+        }
+        res = multipleAction.execute(sync:_*)
         _out :+= res
       }
 
@@ -47,7 +52,6 @@ class MultipleSyncActor[T](multipleAction: IMultipleAction[T]) extends Actor wit
 object MultipleSyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T](action: IMultipleAction[T]) = system.actorOf(MultipleSyncActor.props(action))
-  def apply[T](name: String, action: IMultipleAction[T]) = system.actorOf(MultipleSyncActor.props(action), name)
-  def props[T](action: IMultipleAction[T]) = Props(classOf[MultipleSyncActor[T]], action)
+  def apply[T](action: IMultipleAction[T], syncPoints: Seq[ConcurrentLinkedQueue[T]]) = system.actorOf(MultipleSyncActor.props(action, syncPoints))
+  def props[T](action: IMultipleAction[T], syncPoints: Seq[ConcurrentLinkedQueue[T]]) = Props(classOf[MultipleSyncActor[T]], action, syncPoints)
 }

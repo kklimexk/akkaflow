@@ -5,13 +5,9 @@ import pl.edu.agh.messages._
 
 class PropagateDataForMultipleSyncActor(data: List[Int]) extends Actor {
   def receive = {
-    case PropagateDataForMultipleSync1(elem) =>
+    case PropagateDataForMultipleSync(elem, uId) =>
       data.foreach { d =>
-        elem.syncActor ! SyncDataMessage1(d)
-      }
-    case PropagateDataForMultipleSync2(elem) =>
-      data.foreach { d =>
-        elem.syncActor ! SyncDataMessage2(d)
+        elem.syncActor ! SyncDataMessage(d, uId)
       }
   }
 }

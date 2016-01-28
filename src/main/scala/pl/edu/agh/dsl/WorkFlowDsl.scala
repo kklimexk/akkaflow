@@ -45,13 +45,8 @@ object WorkFlowDsl {
 
   implicit class TwoInputsDataToNext(ins: (In, In)) {
     def ~>>[T](elem: MultipleSync[T]) = {
-      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync1(elem)
-      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync2(elem)
-      /*(ins._1.data zip ins._2.data).foreach { case (d1, d2) =>
-        elem.syncActor ! DataMessage(d1)
-        elem.syncActor ! DataMessage(d2)
-      }
-      elem*/
+      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
+      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
     }
   }
 

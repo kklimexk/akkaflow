@@ -29,7 +29,8 @@ object MergeMain extends App {
   val mergeProc = Merge[Int]
 
   val w = Workflow (
-    "Merge example workflow",
+    name = "Merge example workflow",
+    numOfIns = 2,
     (ins, out) => {
       ins(0) ~>> sqrProc
       ins(1) ~>> sumProc

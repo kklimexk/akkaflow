@@ -50,6 +50,23 @@ object WorkFlowDsl {
     }
   }
 
+  implicit class ThreeInputsDataToNext(ins: (In, In, In)) {
+    def ~>>[T](elem: MultipleSync[T]) = {
+      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
+      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
+      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 2)
+    }
+  }
+
+  implicit class FourInputsDataToNext(ins: (In, In, In, In)) {
+    def ~>>[T](elem: MultipleSync[T]) = {
+      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
+      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
+      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 2)
+      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 3)
+    }
+  }
+
   implicit class ResultToNext(data: List[Int]) {
     def ~>[T](elem: Merge[T]) = {
       PropagateDataForMergeActor(data) ! PropagateDataForMerge(elem)

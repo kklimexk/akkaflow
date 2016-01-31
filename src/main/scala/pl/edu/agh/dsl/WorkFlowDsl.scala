@@ -71,6 +71,11 @@ object WorkFlowDsl {
     def ~>[T](elem: Merge[T]) = {
       PropagateDataForMergeActor(data) ! PropagateDataForMerge(elem)
     }
+    def ~>[T](elem: Sync[T]) = {
+      data.foreach { d =>
+        elem.syncActor ! DataMessage(d)
+      }
+    }
     def ~>>(out: Out) = {
       var outRes = out.result
       data.foreach { d =>

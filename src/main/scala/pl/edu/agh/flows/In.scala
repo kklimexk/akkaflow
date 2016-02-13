@@ -1,3 +1,3 @@
 package pl.edu.agh.flows
 
-case class In(var data: List[Int])
+case class In[T](var data: List[T])

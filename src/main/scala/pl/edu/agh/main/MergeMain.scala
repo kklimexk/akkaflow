@@ -2,7 +2,7 @@ package pl.edu.agh.main
 
 import pl.edu.agh.actions.Action
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows.Source
+import pl.edu.agh.flows.{Out, In, Source}
 import pl.edu.agh.utils.ActorUtils._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
@@ -10,20 +10,20 @@ import pl.edu.agh.workflow_patterns.synchronization._
 
 object MergeMain extends App {
 
-  val sum = Action[Int] { in =>
+  val sum = Action[Int, Int] { in =>
     in + in
   }
 
-  val sqr = Action[Int] { in =>
+  val sqr = Action[Int, Int] { in =>
     in * in * in * in
   }
 
   val sumProc = Sync {
-    Send -> sum
+    sum
   }
 
   val sqrProc = Sync {
-    Send -> sqr
+    sqr
   }
 
   val mergeProc = Merge[Int]
@@ -32,7 +32,7 @@ object MergeMain extends App {
     name = "Merge example workflow",
     numOfIns = 2,
     numOfOuts = 1,
-    (ins, outs) => {
+    (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       ins(0) ~>> sqrProc
       ins(1) ~>> sumProc
 

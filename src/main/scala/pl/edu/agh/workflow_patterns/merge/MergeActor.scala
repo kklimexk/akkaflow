@@ -3,9 +3,9 @@ package pl.edu.agh.workflow_patterns.merge
 import akka.actor.{Props, ActorLogging, Actor}
 import pl.edu.agh.messages.{DataMessage, Get}
 
-class MergeActor[T] extends Actor with MergeProcess with ActorLogging {
+class MergeActor[T] extends Actor with MergeProcess[T] with ActorLogging {
   def receive = {
-    case DataMessage(data: Int) =>
+    case DataMessage(data: T) =>
       //log.info("DATA: {}", data)
       _out :+= data
     case Get =>

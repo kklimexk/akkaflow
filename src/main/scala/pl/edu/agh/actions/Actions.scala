@@ -1,45 +1,45 @@
 package pl.edu.agh.actions
 
-abstract class IAction[T: Acceptable] {
+abstract class IAction[T, K] {
   var numOfIns: Int
-  def execute(ins: T*): Int
+  def execute(ins: T*): K
 }
-abstract class ISingleAction[T: Acceptable] extends IAction[T]
-abstract class IMultipleAction[T: Acceptable] extends IAction[T]
+abstract class ISingleAction[T, K] extends IAction[T, K]
+abstract class IMultipleAction[T, K] extends IAction[T, K]
 
-case class Action[T: Acceptable](action: T => Int) extends ISingleAction[T] {
+case class Action[T, K](action: T => K) extends ISingleAction[T, K] {
   var numOfIns: Int = 1
 
-  def execute(ins: T*): Int = {
+  def execute(ins: T*): K = {
     action(ins(0))
   }
 }
 
-case class Action2[T: Acceptable](action: (T, T) => Int) extends IMultipleAction[T] {
+case class Action2[T, K](action: (T, T) => K) extends IMultipleAction[T, K] {
   var numOfIns: Int = 2
 
-  def execute(ins: T*): Int = {
+  def execute(ins: T*): K = {
     action(ins(0), ins(1))
   }
 }
 
-case class Action3[T: Acceptable](action: (T, T, T) => Int) extends IMultipleAction[T] {
+case class Action3[T, K](action: (T, T, T) => K) extends IMultipleAction[T, K] {
   var numOfIns: Int = 3
 
-  def execute(ins: T*): Int = {
+  def execute(ins: T*): K = {
     action(ins(0), ins(1), ins(2))
   }
 }
 
-case class Action4[T: Acceptable](action: (T, T, T, T) => Int) extends IMultipleAction[T] {
+case class Action4[T, K](action: (T, T, T, T) => K) extends IMultipleAction[T, K] {
   var numOfIns: Int = 4
 
-  def execute(ins: T*): Int = {
+  def execute(ins: T*): K = {
     action(ins(0), ins(1), ins(2), ins(3))
   }
 }
 
-case class MultipleAction[T: Acceptable](action: Seq[T] => Int) extends IMultipleAction[T] {
+case class MultipleAction[T, K](action: Seq[T] => K) extends IMultipleAction[T, K] {
 
   /*TODO: Tutaj nie dziala ponizszy kod - nie wiadomo jak zcastowac reflect.runtime.universe.Type (head) na Seq[Int]
   if (action.isInstanceOf[Seq[Int] => Int]) {
@@ -48,7 +48,7 @@ case class MultipleAction[T: Acceptable](action: Seq[T] => Int) extends IMultipl
    */
   var numOfIns: Int = ???
 
-  def execute(ins: T*): Int = {
+  def execute(ins: T*): K = {
     action(ins)
   }
 }

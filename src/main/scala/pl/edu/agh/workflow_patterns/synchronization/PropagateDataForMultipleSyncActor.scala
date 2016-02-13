@@ -3,7 +3,7 @@ package pl.edu.agh.workflow_patterns.synchronization
 import akka.actor.{Actor, Props}
 import pl.edu.agh.messages._
 
-class PropagateDataForMultipleSyncActor(data: List[Int]) extends Actor {
+class PropagateDataForMultipleSyncActor[T](data: List[T]) extends Actor {
   def receive = {
     case PropagateDataForMultipleSync(elem, uId) =>
       data.foreach { d =>
@@ -15,6 +15,6 @@ class PropagateDataForMultipleSyncActor(data: List[Int]) extends Actor {
 object PropagateDataForMultipleSyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply(data: List[Int]) = system.actorOf(PropagateDataForMultipleSyncActor.props(data))
-  def props(data: List[Int]) = Props(classOf[PropagateDataForMultipleSyncActor], data)
+  def apply[T](data: List[T]) = system.actorOf(PropagateDataForMultipleSyncActor.props(data))
+  def props[T](data: List[T]) = Props(classOf[PropagateDataForMultipleSyncActor[T]], data)
 }

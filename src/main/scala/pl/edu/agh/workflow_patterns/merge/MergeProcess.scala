@@ -2,8 +2,8 @@ package pl.edu.agh.workflow_patterns.merge
 
 import pl.edu.agh.workflow_patterns.WorkflowProcess
 
-trait MergeProcess extends WorkflowProcess {
-  var _out = List.empty[Int]
+trait MergeProcess[K] extends WorkflowProcess {
+  var _out = List.empty[K]
   def out = {
     //TODO: To trzeba zmienic
     Thread.sleep(200)

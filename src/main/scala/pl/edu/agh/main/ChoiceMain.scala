@@ -2,19 +2,19 @@ package pl.edu.agh.main
 
 import pl.edu.agh.actions.Action
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows.Source
+import pl.edu.agh.flows.{Out, In, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.utils.ActorUtils._
 
 object ChoiceMain extends App {
 
-  val action = Action[Int] { in =>
+  val action = Action[Int, Int] { in =>
     in
   }
 
-  val choiceProc = Choice (
-    send (action),
+  val choiceProc = Choice[Int, Int] (
+    action,
     in => (in > 0, in == 0, in < 0)
   )
 
@@ -22,7 +22,7 @@ object ChoiceMain extends App {
     "Example Choice Workflow",
     numOfIns = 1,
     numOfOuts = 3,
-    (ins, outs) => {
+    (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       ins(0) ~>> choiceProc
       choiceProc.out1 ~>> outs(0)
       choiceProc.out2 ~>> outs(2)

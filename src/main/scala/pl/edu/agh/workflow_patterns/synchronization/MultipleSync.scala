@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import pl.edu.agh.actions.IMultipleAction
 
 //Sync Pattern with multiple inputs
-class MultipleSync[T](action: IMultipleAction[T]) {
+class MultipleSync[T, K](action: IMultipleAction[T, K]) {
 
   //Ewentualnie mozna uzyc LinkedBlockingQueue
   val syncPointsQueues = {
@@ -20,5 +20,5 @@ class MultipleSync[T](action: IMultipleAction[T]) {
 }
 
 object MultipleSync {
-  def apply[T](action: IMultipleAction[T]) = new MultipleSync[T](action)
+  def apply[T, K](action: IMultipleAction[T, K]) = new MultipleSync[T, K](action)
 }

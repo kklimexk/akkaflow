@@ -2,20 +2,20 @@ package pl.edu.agh.workflow
 
 import pl.edu.agh.flows.{In, Out}
 
-abstract class AbstractWorkflow(name: String, numOfIns: Int, numOfOuts: Int) {
+abstract class AbstractWorkflow[T, K](name: String, numOfIns: Int, numOfOuts: Int) {
 
   var ins = {
-    var insSeq = Seq.empty[In]
+    var insSeq = Seq.empty[In[T]]
     for (i <- 0 until numOfIns) {
-      insSeq :+= In(List.empty[Int])
+      insSeq :+= In(List.empty[T])
     }
     insSeq
   }
 
   var outs = {
-    var outsSeq = Seq.empty[Out]
+    var outsSeq = Seq.empty[Out[K]]
     for (i <- 0 until numOfOuts) {
-      outsSeq :+= Out(List.empty[Int])
+      outsSeq :+= Out(List.empty[K])
     }
     outsSeq
   }

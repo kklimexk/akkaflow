@@ -26,16 +26,16 @@ object ActorUtils {
       Await.result(actorF, timeout.duration).asInstanceOf[WorkflowProcess]
     }
 
-    def toSyncActor[T]: SyncActor[T] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T]]
+    def toSyncActor[T, K]: SyncActor[T, K] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, K]]
     }
 
-    def toMultipleSyncActor[T]: MultipleSyncActor[T] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[MultipleSyncActor[T]]
+    def toMultipleSyncActor[T, K]: MultipleSyncActor[T, K] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[MultipleSyncActor[T, K]]
     }
 
-    def toChoiceActor[T]: ChoiceActor[T] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T]]
+    def toChoiceActor[T, K]: ChoiceActor[T, K] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T, K]]
     }
 
     def toMergeActor[T]: MergeActor[T] = {
@@ -53,8 +53,8 @@ object ActorUtils {
     }*/
 
   }
-  implicit def convertSyncToSyncActor[T](sync: Sync[T]): SyncActor[T] = sync.syncActor.toSyncActor
-  implicit def convertMultipleSyncToMultipleSyncActor[T](mSync: MultipleSync[T]): MultipleSyncActor[T] = mSync.syncActor.toMultipleSyncActor
-  implicit def convertChoiceToChoiceActor[T](choice: Choice[T]): ChoiceActor[T] = choice.choiceActor.toChoiceActor
+  implicit def convertSyncToSyncActor[T, K](sync: Sync[T, K]): SyncActor[T, K] = sync.syncActor.toSyncActor
+  implicit def convertMultipleSyncToMultipleSyncActor[T, K](mSync: MultipleSync[T, K]): MultipleSyncActor[T, K] = mSync.syncActor.toMultipleSyncActor
+  implicit def convertChoiceToChoiceActor[T, K](choice: Choice[T, K]): ChoiceActor[T, K] = choice.choiceActor.toChoiceActor
   implicit def convertMergeToMergeActor[T](merge: Merge[T]): MergeActor[T] = merge.mergeActor.toMergeActor
 }

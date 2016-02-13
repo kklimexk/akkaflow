@@ -1,6 +1,5 @@
 package pl.edu.agh.dsl
 
-import pl.edu.agh.actions._
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.messages._
 import pl.edu.agh.workflow_patterns.choice.Choice
@@ -15,27 +14,27 @@ object WorkFlowDsl {
         workflow.in.data :+= d
       }
     }*/
-    def ~>(in: In) = {
+    def ~>(in: In[Int]) = {
       source.data.foreach { d =>
         in.data :+= d
       }
     }
   }
 
-  implicit class InputDataToNext(in: In) {
-    def ~>>[T](elem: Sync[T]) = {
+  implicit class InputDataToNext[T](in: In[T]) {
+    def ~>>[K](elem: Sync[T, K]) = {
       in.data.foreach { d =>
         elem.syncActor ! DataMessage(d)
       }
       elem
     }
-    def ~>>[T](elem: Choice[T]) = {
+    def ~>>[K](elem: Choice[T, K]) = {
       in.data.foreach { d =>
         elem.choiceActor ! DataMessage(d)
       }
       elem
     }
-    def ~>>[T](elem: Merge[T]) = {
+    def ~>>(elem: Merge[T]) = {
       in.data.foreach { d =>
         elem.mergeActor ! DataMessage(d)
       }
@@ -43,23 +42,23 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class TwoInputsDataToNext(ins: (In, In)) {
-    def ~>>[T](elem: MultipleSync[T]) = {
+  implicit class TwoInputsDataToNext[T](ins: (In[T], In[T])) {
+    def ~>>[K](elem: MultipleSync[T, K]) = {
       PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
       PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
     }
   }
 
-  implicit class ThreeInputsDataToNext(ins: (In, In, In)) {
-    def ~>>[T](elem: MultipleSync[T]) = {
+  implicit class ThreeInputsDataToNext[T](ins: (In[T], In[T], In[T])) {
+    def ~>>[K](elem: MultipleSync[T, K]) = {
       PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
       PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
       PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 2)
     }
   }
 
-  implicit class FourInputsDataToNext(ins: (In, In, In, In)) {
-    def ~>>[T](elem: MultipleSync[T]) = {
+  implicit class FourInputsDataToNext[T](ins: (In[T], In[T], In[T], In[T])) {
+    def ~>>[K](elem: MultipleSync[T, K]) = {
       PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
       PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
       PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 2)
@@ -67,16 +66,16 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ResultToNext(data: List[Int]) {
+  implicit class ResultToNext[K](data: List[K]) {
     def ~>[T](elem: Merge[T]) = {
       PropagateDataForMergeActor(data) ! PropagateDataForMerge(elem)
     }
-    def ~>[T](elem: Sync[T]) = {
+    def ~>[T](elem: Sync[T, K]) = {
       data.foreach { d =>
         elem.syncActor ! DataMessage(d)
       }
     }
-    def ~>>(out: Out) = {
+    def ~>>(out: Out[K]) = {
       var outRes = out.result
       data.foreach { d =>
         outRes :+= d
@@ -86,8 +85,8 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ForwardIteratorDataToNext(data: Iterator[List[Int]]) {
-    def ~>[T](elem: Sync[T]) = {
+  implicit class ForwardIteratorDataToNext[K](data: Iterator[List[K]]) {
+    def ~>[T](elem: Sync[T, K]) = {
       data.toList.foreach { d =>
         elem.syncActor ! DataMessage(d)
       }
@@ -95,8 +94,8 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ForwardListOfListsDataToNext(data: List[List[Int]]) {
-    def ~>[T](elem: Sync[T]) = {
+  implicit class ForwardListOfListsDataToNext[K](data: List[List[K]]) {
+    def ~>[T](elem: Sync[T, K]) = {
       data.foreach { d =>
         elem.syncActor ! DataMessage(d)
       }
@@ -104,7 +103,7 @@ object WorkFlowDsl {
     }
   }
 
-  implicit object Send {
+  /*implicit object Send {
     def ->[T](action: ISingleAction[T]) = {
       action
     }
@@ -114,6 +113,6 @@ object WorkFlowDsl {
   }
 
   def send[T](action: ISingleAction[T]) = action
-  def send[T](action: IMultipleAction[T]) = action
+  def send[T](action: IMultipleAction[T]) = action*/
 
 }

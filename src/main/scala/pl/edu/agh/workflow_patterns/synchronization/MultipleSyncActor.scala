@@ -7,7 +7,7 @@ import akka.actor.{Props, ActorLogging, Actor}
 import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.messages._
 
-class MultipleSyncActor[T](multipleAction: IMultipleAction[T], syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends Actor with SyncProcess with ActorLogging {
+class MultipleSyncActor[T, K](multipleAction: IMultipleAction[T, K], syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends Actor with SyncProcess[K] with ActorLogging {
 
   def receive = {
     case SyncDataMessage(data: T, uId) =>
@@ -33,7 +33,7 @@ class MultipleSyncActor[T](multipleAction: IMultipleAction[T], syncPoints: Seq[C
         syncPoints.foreach { q =>
           sync :+= q.poll()
         }
-        res = multipleAction.execute(sync:_*)
+        var res = multipleAction.execute(sync:_*)
         _out :+= res
       }
 
@@ -52,6 +52,6 @@ class MultipleSyncActor[T](multipleAction: IMultipleAction[T], syncPoints: Seq[C
 object MultipleSyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T](action: IMultipleAction[T], syncPoints: Seq[ConcurrentLinkedQueue[T]]) = system.actorOf(MultipleSyncActor.props(action, syncPoints))
-  def props[T](action: IMultipleAction[T], syncPoints: Seq[ConcurrentLinkedQueue[T]]) = Props(classOf[MultipleSyncActor[T]], action, syncPoints)
+  def apply[T, K](action: IMultipleAction[T, K], syncPoints: Seq[ConcurrentLinkedQueue[T]]) = system.actorOf(MultipleSyncActor.props(action, syncPoints))
+  def props[T, K](action: IMultipleAction[T, K], syncPoints: Seq[ConcurrentLinkedQueue[T]]) = Props(classOf[MultipleSyncActor[T, K]], action, syncPoints)
 }

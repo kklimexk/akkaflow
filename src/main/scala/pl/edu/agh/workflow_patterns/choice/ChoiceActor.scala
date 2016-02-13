@@ -5,10 +5,10 @@ import pl.edu.agh.actions.ISingleAction
 import pl.edu.agh.messages.{Get, DataMessage}
 
 //Choice Pattern
-class ChoiceActor[T](action: ISingleAction[T], conditions: Int => (Boolean, Boolean, Boolean)) extends Actor with ChoiceProcess with ActorLogging {
+class ChoiceActor[T, K](action: ISingleAction[T, K], conditions: K => (Boolean, Boolean, Boolean)) extends Actor with ChoiceProcess[K] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
-      res = action.execute(data)
+      var res = action.execute(data)
       //log.info("Computing action: {}", res)
       val conds = conditions(res)
       res match {
@@ -24,7 +24,7 @@ class ChoiceActor[T](action: ISingleAction[T], conditions: Int => (Boolean, Bool
 object ChoiceActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T](action: ISingleAction[T], conditions: Int => (Boolean, Boolean, Boolean)) = system.actorOf(ChoiceActor.props(action, conditions))
-  def apply[T](name: String, action: ISingleAction[T], conditions: Int => (Boolean, Boolean, Boolean)) = system.actorOf(ChoiceActor.props(action, conditions), name)
-  def props[T](action: ISingleAction[T], conditions: Int => (Boolean, Boolean, Boolean)) = Props(classOf[ChoiceActor[T]], action, conditions)
+  def apply[T, K](action: ISingleAction[T, K], conditions: K => (Boolean, Boolean, Boolean)) = system.actorOf(ChoiceActor.props(action, conditions))
+  def apply[T, K](name: String, action: ISingleAction[T, K], conditions: K => (Boolean, Boolean, Boolean)) = system.actorOf(ChoiceActor.props(action, conditions), name)
+  def props[T, K](action: ISingleAction[T, K], conditions: K => (Boolean, Boolean, Boolean)) = Props(classOf[ChoiceActor[T, K]], action, conditions)
 }

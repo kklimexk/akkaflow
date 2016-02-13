@@ -31,14 +31,15 @@ object MergeMain extends App {
   val w = Workflow (
     name = "Merge example workflow",
     numOfIns = 2,
-    (ins, out) => {
+    numOfOuts = 1,
+    (ins, outs) => {
       ins(0) ~>> sqrProc
       ins(1) ~>> sumProc
 
       sqrProc.out ~> mergeProc
       sumProc.out ~> mergeProc
 
-      mergeProc.out ~>> out
+      mergeProc.out ~>> outs(0)
     }
   )
 

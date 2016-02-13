@@ -20,10 +20,13 @@ object ChoiceMain extends App {
 
   val w = Workflow (
     "Example Choice Workflow",
-    (ins, out) => {
+    numOfIns = 1,
+    numOfOuts = 3,
+    (ins, outs) => {
       ins(0) ~>> choiceProc
-      choiceProc.out1 ~>> out
-      choiceProc.out3 ~>> out
+      choiceProc.out1 ~>> outs(0)
+      choiceProc.out2 ~>> outs(2)
+      choiceProc.out3 ~>> outs(1)
     }
   )
 

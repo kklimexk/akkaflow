@@ -29,10 +29,10 @@ object SyncMain extends App {
 
   val w = Workflow (
     "Sum of Squares workflow",
-    (ins, out) => {
+    (ins, outs) => {
       ins(0) ~>> sqrProc
       sqrProc.out.grouped(3) ~> sumProc
-      sumProc.out ~>> out
+      sumProc.out ~>> outs(0)
     }
   )
 

@@ -28,9 +28,10 @@ object MultipleSyncMain extends App {
   val w = Workflow (
     name = "Sum of two inputs and multiply every three of them",
     numOfIns = 2,
-    (ins, out) => {
+    numOfOuts = 1,
+    (ins, outs) => {
       (ins(0), ins(1)) ~>> sumProc
-      sumProc.out ~>> out
+      sumProc.out ~>> outs(0)
     }
   )
 

@@ -18,6 +18,10 @@ object MergeMain extends App {
     in * in * in * in
   }
 
+  val mergeAct = Action[Int, Int] { in =>
+    in
+  }
+
   val sumProc = Sync {
     sum
   }
@@ -26,7 +30,9 @@ object MergeMain extends App {
     sqr
   }
 
-  val mergeProc = Merge[Int]
+  val mergeProc = Merge {
+    mergeAct
+  }
 
   val w = Workflow (
     name = "Merge example workflow",

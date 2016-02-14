@@ -34,7 +34,7 @@ object WorkFlowDsl {
       }
       elem
     }
-    def ~>>(elem: Merge[T]) = {
+    def ~>>[K](elem: Merge[T, K]) = {
       in.data.foreach { d =>
         elem.mergeActor ! DataMessage(d)
       }
@@ -67,7 +67,7 @@ object WorkFlowDsl {
   }
 
   implicit class ResultToNext[K](data: List[K]) {
-    def ~>[T](elem: Merge[T]) = {
+    def ~>[T](elem: Merge[T, K]) = {
       PropagateDataForMergeActor(data) ! PropagateDataForMerge(elem)
     }
     def ~>[T](elem: Sync[T, K]) = {

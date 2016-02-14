@@ -38,8 +38,8 @@ object ActorUtils {
       Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T, K]]
     }
 
-    def toMergeActor[T]: MergeActor[T] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T]]
+    def toMergeActor[T, K]: MergeActor[T, K] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T, K]]
     }
 
     /*def out: List[Int] = {
@@ -56,5 +56,5 @@ object ActorUtils {
   implicit def convertSyncToSyncActor[T, K](sync: Sync[T, K]): SyncActor[T, K] = sync.syncActor.toSyncActor
   implicit def convertMultipleSyncToMultipleSyncActor[T, K](mSync: MultipleSync[T, K]): MultipleSyncActor[T, K] = mSync.syncActor.toMultipleSyncActor
   implicit def convertChoiceToChoiceActor[T, K](choice: Choice[T, K]): ChoiceActor[T, K] = choice.choiceActor.toChoiceActor
-  implicit def convertMergeToMergeActor[T](merge: Merge[T]): MergeActor[T] = merge.mergeActor.toMergeActor
+  implicit def convertMergeToMergeActor[T, K](merge: Merge[T, K]): MergeActor[T, K] = merge.mergeActor.toMergeActor
 }

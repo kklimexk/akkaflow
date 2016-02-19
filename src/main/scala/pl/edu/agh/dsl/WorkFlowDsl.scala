@@ -1,10 +1,11 @@
 package pl.edu.agh.dsl
 
+import pl.edu.agh.data_propagators.{PropagateDataForMultipleSyncActor, PropagateDataActor}
 import pl.edu.agh.flows.{StringSource, In, Out, Source}
 import pl.edu.agh.messages._
 import pl.edu.agh.workflow_patterns.Pattern
-import pl.edu.agh.workflow_patterns.merge.{PropagateDataForMergeActor, Merge}
-import pl.edu.agh.workflow_patterns.synchronization.{PropagateDataForMultipleSyncActor, MultipleSync}
+import pl.edu.agh.workflow_patterns.merge.Merge
+import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
 
 import scala.collection.mutable.ListBuffer
 
@@ -71,7 +72,7 @@ object WorkFlowDsl {
 
   implicit class ResultToNext[K](data: List[K]) {
     def ~>[T](elem: Merge[T, K]) = {
-      PropagateDataForMergeActor(data) ! PropagateDataForMerge(elem)
+      PropagateDataActor(data) ! PropagateData(elem)
     }
     def ~>[T](elem: Pattern[T, K]) = {
       data.foreach { d =>

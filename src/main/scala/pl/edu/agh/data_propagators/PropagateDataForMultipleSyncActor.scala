@@ -1,4 +1,4 @@
-package pl.edu.agh.workflow_patterns.synchronization
+package pl.edu.agh.data_propagators
 
 import akka.actor.{Actor, Props}
 import pl.edu.agh.messages._

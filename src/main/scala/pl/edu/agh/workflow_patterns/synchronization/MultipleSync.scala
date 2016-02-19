@@ -3,9 +3,10 @@ package pl.edu.agh.workflow_patterns.synchronization
 import java.util.concurrent.ConcurrentLinkedQueue
 
 import pl.edu.agh.actions.IMultipleAction
+import pl.edu.agh.workflow_patterns.Pattern
 
 //Sync Pattern with multiple inputs
-class MultipleSync[T, K](action: IMultipleAction[T, K]) {
+class MultipleSync[T, K](action: IMultipleAction[T, K]) extends Pattern[T, K] {
 
   //Ewentualnie mozna uzyc LinkedBlockingQueue
   val syncPointsQueues = {
@@ -16,7 +17,7 @@ class MultipleSync[T, K](action: IMultipleAction[T, K]) {
     res
   }
 
-  lazy val syncActor = MultipleSyncActor(action, syncPointsQueues)
+  override lazy val actor = MultipleSyncActor(action, syncPointsQueues)
 }
 
 object MultipleSync {

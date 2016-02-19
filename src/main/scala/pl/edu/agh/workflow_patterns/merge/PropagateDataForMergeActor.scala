@@ -8,7 +8,7 @@ class PropagateDataForMergeActor[T](data: List[T]) extends Actor {
   def receive = {
     case PropagateDataForMerge(elem) =>
       data.foreach { d =>
-        elem.mergeActor ! DataMessage(d)
+        elem.actor ! DataMessage(d)
       }
   }
 }

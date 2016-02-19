@@ -7,7 +7,7 @@ class PropagateDataForMultipleSyncActor[T](data: List[T]) extends Actor {
   def receive = {
     case PropagateDataForMultipleSync(elem, uId) =>
       data.foreach { d =>
-        elem.syncActor ! SyncDataMessage(d, uId)
+        elem.actor ! SyncDataMessage(d, uId)
       }
   }
 }

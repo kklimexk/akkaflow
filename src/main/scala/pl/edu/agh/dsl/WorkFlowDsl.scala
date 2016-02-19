@@ -2,9 +2,9 @@ package pl.edu.agh.dsl
 
 import pl.edu.agh.flows.{StringSource, In, Out, Source}
 import pl.edu.agh.messages._
-import pl.edu.agh.workflow_patterns.choice.Choice
+import pl.edu.agh.workflow_patterns.Pattern
 import pl.edu.agh.workflow_patterns.merge.{PropagateDataForMergeActor, Merge}
-import pl.edu.agh.workflow_patterns.synchronization.{PropagateDataForMultipleSyncActor, MultipleSync, Sync}
+import pl.edu.agh.workflow_patterns.synchronization.{PropagateDataForMultipleSyncActor, MultipleSync}
 
 import scala.collection.mutable.ListBuffer
 
@@ -37,21 +37,9 @@ object WorkFlowDsl {
   }
 
   implicit class InputDataToNext[T](in: In[T]) {
-    def ~>>[K](elem: Sync[T, K]) = {
+    def ~>>[K](elem: Pattern[T, K]) = {
       in.data.foreach { d =>
-        elem.syncActor ! DataMessage(d)
-      }
-      elem
-    }
-    def ~>>[K](elem: Choice[T, K]) = {
-      in.data.foreach { d =>
-        elem.choiceActor ! DataMessage(d)
-      }
-      elem
-    }
-    def ~>>[K](elem: Merge[T, K]) = {
-      in.data.foreach { d =>
-        elem.mergeActor ! DataMessage(d)
+        elem.actor ! DataMessage(d)
       }
       elem
     }
@@ -85,9 +73,9 @@ object WorkFlowDsl {
     def ~>[T](elem: Merge[T, K]) = {
       PropagateDataForMergeActor(data) ! PropagateDataForMerge(elem)
     }
-    def ~>[T](elem: Sync[T, K]) = {
+    def ~>[T](elem: Pattern[T, K]) = {
       data.foreach { d =>
-        elem.syncActor ! DataMessage(d)
+        elem.actor ! DataMessage(d)
       }
     }
     def ~>>(out: Out[K]) = {
@@ -112,18 +100,18 @@ object WorkFlowDsl {
   }
 
   implicit class ForwardIteratorDataToNext[K](data: Iterator[List[K]]) {
-    def ~>[T](elem: Sync[T, K]) = {
+    def ~>[T](elem: Pattern[T, K]) = {
       data.toList.foreach { d =>
-        elem.syncActor ! DataMessage(d)
+        elem.actor ! DataMessage(d)
       }
       elem
     }
   }
 
   implicit class ForwardListOfListsDataToNext[K](data: List[List[K]]) {
-    def ~>[T](elem: Sync[T, K]) = {
+    def ~>[T](elem: Pattern[T, K]) = {
       data.foreach { d =>
-        elem.syncActor ! DataMessage(d)
+        elem.actor ! DataMessage(d)
       }
       elem
     }

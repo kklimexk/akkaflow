@@ -1,20 +1,35 @@
 package pl.edu.agh.dsl
 
-import pl.edu.agh.flows.{In, Out, Source}
+import pl.edu.agh.flows.{StringSource, In, Out, Source}
 import pl.edu.agh.messages._
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.workflow_patterns.merge.{PropagateDataForMergeActor, Merge}
 import pl.edu.agh.workflow_patterns.synchronization.{PropagateDataForMultipleSyncActor, MultipleSync, Sync}
 
+import scala.collection.mutable.ListBuffer
+
 object WorkFlowDsl {
 
-  implicit class InputDataToWorkflow(source: Source) {
+  implicit class SourceDataToWorkflow(source: Source) {
     /*def ~>(workflow: Workflow) = {
       source.data.foreach { d =>
         workflow.in.data :+= d
       }
     }*/
     def ~>(in: In[Int]) = {
+      source.data.foreach { d =>
+        in.data :+= d
+      }
+    }
+  }
+
+  implicit class StrSourceDataToWorkflow(source: StringSource) {
+    /*def ~>(workflow: Workflow) = {
+      source.data.foreach { d =>
+        workflow.in.data :+= d
+      }
+    }*/
+    def ~>(in: In[String]) = {
       source.data.foreach { d =>
         in.data :+= d
       }
@@ -75,6 +90,17 @@ object WorkFlowDsl {
         elem.syncActor ! DataMessage(d)
       }
     }
+    def ~>>(out: Out[K]) = {
+      var outRes = out.result
+      data.foreach { d =>
+        outRes :+= d
+      }
+      out.result = outRes
+      out
+    }
+  }
+
+  implicit class ListBufferToNext[K](data: ListBuffer[K]) {
     def ~>>(out: Out[K]) = {
       var outRes = out.result
       data.foreach { d =>

@@ -3,10 +3,10 @@ package pl.edu.agh.workflow_patterns.choice
 import pl.edu.agh.actions.ISingleAction
 
 //Choice
-class Choice[T, K](action: ISingleAction[T, K], conditions: K => (Boolean, Boolean, Boolean)) {
-  lazy val choiceActor = ChoiceActor(action, conditions)
+class Choice[T, K](numOfIns: Int, numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) {
+  lazy val choiceActor = ChoiceActor(numOfIns, numOfOuts, action, choiceFunc)
 }
 
 object Choice {
-  def apply[T, K](action: ISingleAction[T, K], conditions: K => (Boolean, Boolean, Boolean)) = new Choice(action, conditions)
+  def apply[T, K](numOfIns: Int, numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) = new Choice(numOfIns, numOfOuts, action, choiceFunc)
 }

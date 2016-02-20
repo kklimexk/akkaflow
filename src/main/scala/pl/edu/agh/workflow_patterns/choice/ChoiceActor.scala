@@ -2,7 +2,7 @@ package pl.edu.agh.workflow_patterns.choice
 
 import akka.actor.{ActorLogging, Actor, Props}
 import pl.edu.agh.actions.ISingleAction
-import pl.edu.agh.messages.{Get, DataMessage}
+import pl.edu.agh.messages.{ResultMessage, Get, DataMessage}
 
 //Choice Pattern
 class ChoiceActor[T, K](numOfIns: Int, numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) extends ChoiceProcess[T, K](numOfIns, numOfOuts) with Actor with ActorLogging {
@@ -10,9 +10,9 @@ class ChoiceActor[T, K](numOfIns: Int, numOfOuts: Int, action: ISingleAction[T, 
     case DataMessage(data: T) =>
       val res = action.execute(data)
       //log.info("Computing action: {}", res)
-      val i = choiceFunc(res) % outs.length
+      val i = choiceFunc(res) % _outs.length
 
-      outs(i) += res
+      _outs(i) ! ResultMessage(res)
     case Get =>
       sender ! this
   }

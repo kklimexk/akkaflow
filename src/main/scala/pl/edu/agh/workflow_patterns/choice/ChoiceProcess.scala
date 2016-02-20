@@ -1,8 +1,8 @@
 package pl.edu.agh.workflow_patterns.choice
 
+import akka.actor.ActorRef
+import pl.edu.agh.flows.Sink
 import pl.edu.agh.workflow_patterns.WorkflowProcess
-
-import scala.collection.mutable.ListBuffer
 
 abstract class ChoiceProcess[T, K](numOfIns: Int, numOfOuts: Int) extends WorkflowProcess {
 
@@ -14,12 +14,16 @@ abstract class ChoiceProcess[T, K](numOfIns: Int, numOfOuts: Int) extends Workfl
     insSeq
   }
 
-  var outs = {
-    var outsSeq = Seq.empty[ListBuffer[K]]
+  var _outs = {
+    var outsSeq = Seq.empty[ActorRef]
     for (i <- 0 until numOfOuts) {
-      outsSeq :+= ListBuffer.empty[K]
+      outsSeq :+= Sink[K]()
     }
     outsSeq
+  }
+
+  def outs = {
+    _outs
   }
 
 }

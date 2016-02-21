@@ -6,7 +6,7 @@ import pl.edu.agh.workflow_patterns.WorkflowProcess
 
 abstract class ChoiceProcess[T, K](numOfOuts: Int) extends WorkflowProcess {
 
-  var _outs = {
+  protected var _outs = {
     var outsSeq = Seq.empty[ActorRef]
     for (i <- 0 until numOfOuts) {
       outsSeq :+= Sink[K]()

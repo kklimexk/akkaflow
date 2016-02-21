@@ -73,13 +73,8 @@ object WorkFlowDsl {
   }
 
   implicit class ResultToNext[K](data: List[K]) {
-    def ~>[T](elem: Merge[T, K]) = {
-      PropagateDataActor(data) ! PropagateData(elem)
-    }
     def ~>[T](elem: Pattern[T, K]) = {
-      data.foreach { d =>
-        elem.actor ! DataMessage(d)
-      }
+      PropagateDataActor(data) ! PropagateData(elem)
     }
     def ~>>(out: Out[K]) = {
       var outRes = out.result

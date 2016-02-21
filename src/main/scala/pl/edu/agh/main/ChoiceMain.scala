@@ -15,7 +15,6 @@ object ChoiceMain extends App {
   }
 
   val choiceProc = Choice[String, String] (
-    numOfIns = 1,
     numOfOuts = 3,
     action = action,
     d => crc32(d)
@@ -23,10 +22,11 @@ object ChoiceMain extends App {
 
   val w = Workflow (
     "Example Choice Workflow",
-    numOfIns = 1,
+    numOfIns = 2,
     numOfOuts = 3,
     (ins: Seq[In[String]], outs: Seq[Out[String]]) => {
       ins(0) ~>> choiceProc
+      ins(1) ~>> choiceProc
       choiceProc.outs(0) ~>> outs(0)
       choiceProc.outs(1) ~>> outs(1)
       choiceProc.outs(2) ~>> outs(2)
@@ -34,6 +34,8 @@ object ChoiceMain extends App {
   )
 
   StringSource("ala", "pies", "mama", "telefon", "scala", "java", "obiad", "nauka", "agh") ~> w.ins(0)
+  StringSource("jeden", "dwa", "trzy", "cztery", "piec", "szesc", "siedem", "osiem") ~> w.ins(1)
+
   val res = w.run
   println(res)
   println(w)

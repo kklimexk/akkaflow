@@ -15,6 +15,7 @@ object ChoiceMain extends App {
   }
 
   val choiceProc = Choice[String, String] (
+    name = "choice",
     numOfOuts = 3,
     action = action,
     d => crc32(d)

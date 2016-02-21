@@ -1,14 +1,15 @@
 package pl.edu.agh.flows
 
-import akka.actor.{Props, Actor}
+import akka.actor.{ActorContext, ActorLogging, Props, Actor}
 import pl.edu.agh.messages.{GetOut, Get, ResultMessage}
 
-class Sink[K] extends Actor {
+class Sink[K] extends Actor with ActorLogging {
 
   var out = List.empty[K]
 
   def receive = {
     case ResultMessage(data: K) =>
+      //log.info("CHILD")
       out :+= data
     case GetOut =>
       sender ! out
@@ -19,8 +20,7 @@ class Sink[K] extends Actor {
 }
 
 object Sink {
-  import pl.edu.agh.utils.ActorUtils.system
-
-  def apply[K]() = system.actorOf(Sink.props)
+  def apply[K](context: ActorContext) = context.actorOf(Sink.props)
+  def apply[K](name: String, context: ActorContext) = context.actorOf(Sink.props, name)
   def props[K] = Props[Sink[K]]
 }

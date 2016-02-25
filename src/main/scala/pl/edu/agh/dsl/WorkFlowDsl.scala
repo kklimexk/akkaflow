@@ -6,7 +6,6 @@ import pl.edu.agh.flows._
 import pl.edu.agh.messages._
 import pl.edu.agh.utils.SinkUtils
 import pl.edu.agh.workflow_patterns.Pattern
-import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.synchronization.{Sync, MultipleSync}
 
 object WorkFlowDsl {
@@ -38,11 +37,6 @@ object WorkFlowDsl {
   }
 
   implicit class InputDataToNext[T](in: In[T]) {
-    def ~>>[K](elem: Sync[T, K]) = {
-      in.data.foreach { d =>
-        elem.actor ! DataMessage(d)
-      }
-    }
     def ~>>[K](elem: Pattern[T, K]) = {
       PropagateDataActor(in.data) ! PropagateData(elem)
     }
@@ -87,6 +81,10 @@ object WorkFlowDsl {
   }
 
   implicit class ListBufferToNext[K](sink: ActorRef) {
+    def ~>[T](elem: Pattern[T, K]) = {
+      val data = SinkUtils.getResults[K](sink)
+      PropagateDataActor(data) ! PropagateData(elem)
+    }
     def ~>>(out: Out[K]) = {
 
       val data = SinkUtils.getResults[K](sink)

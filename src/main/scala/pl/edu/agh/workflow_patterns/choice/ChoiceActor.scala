@@ -34,7 +34,6 @@ class ChoiceActor[T, K](numOfOuts: Int, action: ISingleAction[T, K], choiceFunc:
 object ChoiceActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T, K](numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) = system.actorOf(ChoiceActor.props(numOfOuts, action, choiceFunc))
   def apply[T, K](name: String, numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) = system.actorOf(ChoiceActor.props(numOfOuts, action, choiceFunc), name)
   def props[T, K](numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) = Props(classOf[ChoiceActor[T, K]], numOfOuts, action, choiceFunc)
 }

@@ -13,24 +13,30 @@ object SyncMain extends App {
     in * in
   }
 
-  val sum = Action[List[Int], Int] { in =>
-    in.reduceLeft[Int](_+_)
+  val sum = Action[Int, Int] { in =>
+    in + in
   }
 
-  val sqrProc = Sync {
-    sqr
-  }
+  val sqrProc = Sync (
+    name = "sqrProc",
+    numOfOuts = 2,
+    action = sqr,
+    sendTo = "out1"
+  )
 
-  val sumProc = Sync {
-    sum
-  }
+  val sumProc = Sync (
+    name = "sumProc",
+    numOfOuts = 2,
+    action = sum,
+    sendTo = "out0"
+  )
 
   val w = Workflow (
     "Sum of Squares workflow",
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       ins(0) ~>> sqrProc
-      sqrProc.out.grouped(3) ~> sumProc
-      sumProc.out ~>> outs(0)
+      sqrProc.outs(1) ~> sumProc
+      sumProc.outs(0) ~>> outs(0)
     }
   )
 

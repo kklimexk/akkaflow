@@ -17,13 +17,19 @@ object MultipleSyncMain extends App {
     in.reduceLeft[Int](_*_)
   }
 
-  val sumProc = MultipleSync {
-    sum
-  }
+  val sumProc = MultipleSync (
+    name = "sumProc",
+    numOfOuts = 2,
+    action = sum,
+    sendTo = "out0"
+  )
 
-  val mulProc = Sync {
-    mul
-  }
+  val mulProc = Sync (
+    name = "mulProc",
+    numOfOuts = 1,
+    action = mul,
+    sendTo = "out0"
+  )
 
   val w = Workflow (
     name = "Sum of two inputs and multiply every three of them",
@@ -31,7 +37,7 @@ object MultipleSyncMain extends App {
     numOfOuts = 1,
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       (ins(0), ins(1)) ~>> sumProc
-      sumProc.out ~>> outs(0)
+      sumProc.outs(0) ~>> outs(0)
     }
   )
 

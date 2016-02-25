@@ -22,17 +22,26 @@ object MergeMain extends App {
     in
   }
 
-  val sumProc = Sync {
-    sum
-  }
+  val sumProc = Sync (
+    name = "sumProc",
+    numOfOuts = 2,
+    action = sum,
+    sendTo = "out0"
+  )
 
-  val sqrProc = Sync {
-    sqr
-  }
+  val sqrProc = Sync (
+    name = "sqrProc",
+    numOfOuts = 2,
+    action = sqr,
+    sendTo = "out0"
+  )
 
-  val mergeProc = Merge {
-    mergeAct
-  }
+  val mergeProc = Merge (
+    name = "mergeProc",
+    numOfOuts = 1,
+    action = mergeAct,
+    sendTo = "out0"
+  )
 
   val w = Workflow (
     name = "Merge example workflow",
@@ -42,10 +51,10 @@ object MergeMain extends App {
       ins(0) ~>> sqrProc
       ins(1) ~>> sumProc
 
-      sqrProc.out ~> mergeProc
-      sumProc.out ~> mergeProc
+      sqrProc.outs(0) ~> mergeProc
+      sumProc.outs(0) ~> mergeProc
 
-      mergeProc.out ~>> outs(0)
+      mergeProc.outs(0) ~>> outs(0)
     }
   )
 

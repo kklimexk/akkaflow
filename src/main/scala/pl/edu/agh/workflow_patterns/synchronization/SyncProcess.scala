@@ -1,10 +1,9 @@
 package pl.edu.agh.workflow_patterns.synchronization
 
+import akka.actor.ActorRef
 import pl.edu.agh.workflow_patterns.WorkflowProcess
 
 trait SyncProcess[K] extends WorkflowProcess {
-  protected var _out = List.empty[K]
-  def out = {
-    _out
-  }
+  protected var _outs: Seq[ActorRef]
+  def outs: Seq[ActorRef]
 }

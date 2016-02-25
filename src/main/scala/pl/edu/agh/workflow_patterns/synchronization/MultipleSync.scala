@@ -6,7 +6,7 @@ import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.workflow_patterns.Pattern
 
 //Sync Pattern with multiple inputs
-class MultipleSync[T, K](action: IMultipleAction[T, K]) extends Pattern[T, K] {
+class MultipleSync[T, K](name: String, numOfOuts: Int, action: IMultipleAction[T, K], sendTo: String) extends Pattern[T, K] {
 
   //Ewentualnie mozna uzyc LinkedBlockingQueue
   val syncPointsQueues = {
@@ -17,9 +17,9 @@ class MultipleSync[T, K](action: IMultipleAction[T, K]) extends Pattern[T, K] {
     res
   }
 
-  override lazy val actor = MultipleSyncActor(action, syncPointsQueues)
+  override lazy val actor = MultipleSyncActor(name, numOfOuts, action, sendTo, syncPointsQueues)
 }
 
 object MultipleSync {
-  def apply[T, K](action: IMultipleAction[T, K]) = new MultipleSync[T, K](action)
+  def apply[T, K](name: String, numOfOuts: Int, action: IMultipleAction[T, K], sendTo: String) = new MultipleSync[T, K](name, numOfOuts, action, sendTo)
 }

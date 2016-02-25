@@ -6,7 +6,7 @@ import pl.edu.agh.flows._
 import pl.edu.agh.messages._
 import pl.edu.agh.utils.SinkUtils
 import pl.edu.agh.workflow_patterns.Pattern
-import pl.edu.agh.workflow_patterns.synchronization.{Sync, MultipleSync}
+import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
 
 object WorkFlowDsl {
 
@@ -81,6 +81,10 @@ object WorkFlowDsl {
   }
 
   implicit class ListBufferToNext[K](sink: ActorRef) {
+    def grouped[K](size: Int) = {
+      val dataIter = SinkUtils.getGroupedResults[K](sink)(size)
+      dataIter
+    }
     def ~>[T](elem: Pattern[T, K]) = {
       val data = SinkUtils.getResults[K](sink)
       PropagateDataActor(data) ! PropagateData(elem)
@@ -99,12 +103,12 @@ object WorkFlowDsl {
     }
   }
 
+  //TODO: W tych dwoch ponizszych trzeba zrobic Propagatora
   implicit class ForwardIteratorDataToNext[K](data: Iterator[List[K]]) {
     def ~>[T](elem: Pattern[T, K]) = {
       data.toList.foreach { d =>
         elem.actor ! DataMessage(d)
       }
-      elem
     }
   }
 
@@ -113,7 +117,6 @@ object WorkFlowDsl {
       data.foreach { d =>
         elem.actor ! DataMessage(d)
       }
-      elem
     }
   }
 

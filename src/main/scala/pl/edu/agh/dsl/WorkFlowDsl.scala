@@ -81,8 +81,8 @@ object WorkFlowDsl {
   }
 
   implicit class ListBufferToNext[K](sink: ActorRef) {
-    def grouped[K](size: Int) = {
-      val dataIter = SinkUtils.getGroupedResults[K](sink)(size)
+    def grouped[T](size: Int) = {
+      val dataIter = SinkUtils.getGroupedResults[T](sink)(size)
       dataIter
     }
     def ~>[T](elem: Pattern[T, K]) = {

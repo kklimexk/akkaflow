@@ -8,6 +8,10 @@ import pl.edu.agh.utils.SinkUtils
 import pl.edu.agh.workflow_patterns.Pattern
 import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
+
 object WorkFlowDsl {
 
   implicit class SourceDataToWorkflow(source: Source) {
@@ -66,16 +70,26 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ListBufferToNext[K](sink: ActorRef) {
+  object DataState {
+    var dataList = List.empty[Future[Any]]
+  }
+
+  implicit class DataFromSinkToNext[K](sink: ActorRef) {
     def grouped[T](size: Int) = {
       val dataIter = SinkUtils.getGroupedResults[T](sink)(size)
       dataIter
     }
     def ~>[T](elem: Pattern[T, K]) = {
-      val data = SinkUtils.getResults[K](sink)
-      PropagateDataActor(data) ! PropagateData(elem)
+      var dataF = SinkUtils.getResultsAsync[K](sink)
+      DataState.dataList :+= dataF
+      dataF onSuccess {
+        case data: List[K] => PropagateDataActor(data) ! PropagateData(elem)
+      }
     }
     def ~>>(out: Out[K]) = {
+
+      val futureL = Future.sequence(DataState.dataList)
+      Await.ready(futureL, Duration.Inf)
 
       val data = SinkUtils.getResults[K](sink)
 

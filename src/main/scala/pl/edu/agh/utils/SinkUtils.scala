@@ -26,4 +26,10 @@ object SinkUtils {
 
     data
   }
+  def getResultsAsync[K](sink: ActorRef) = {
+    import pl.edu.agh.utils.ActorUtils.{system, timeout}
+
+    val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetOut)
+    dataF.mapTo[List[K]]
+  }
 }

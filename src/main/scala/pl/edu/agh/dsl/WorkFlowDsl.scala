@@ -86,20 +86,23 @@ object WorkFlowDsl {
         case data: List[K] => PropagateDataActor(data) ! PropagateData(elem)
       }
     }
+    //TODO: Zrobic bardziej asynchronicznie
     def ~>>(out: Out[K]) = {
-
       val futureL = Future.sequence(DataState.dataList)
       Await.ready(futureL, Duration.Inf)
 
-      val data = SinkUtils.getResults[K](sink)
+      val dataF = SinkUtils.getResultsAsync[K](sink)
 
-      var outRes = out.result
-      data.foreach { d =>
-        outRes :+= d
-      }
-      out.result = outRes
-      out
+      val outF = dataF.map(data => {
+        var outRes = out.result
+        data.foreach { d =>
+          outRes :+= d
+        }
+        out.result = outRes
+        out
+      })
 
+      Await.result(outF, Duration.Inf)
     }
   }
 

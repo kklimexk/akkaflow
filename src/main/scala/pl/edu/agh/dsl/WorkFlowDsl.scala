@@ -103,20 +103,9 @@ object WorkFlowDsl {
     }
   }
 
-  //TODO: W tych dwoch ponizszych trzeba zrobic Propagatora
   implicit class ForwardIteratorDataToNext[K](data: Iterator[List[K]]) {
     def ~>[T](elem: Pattern[T, K]) = {
-      data.toList.foreach { d =>
-        elem.actor ! DataMessage(d)
-      }
-    }
-  }
-
-  implicit class ForwardListOfListsDataToNext[K](data: List[List[K]]) {
-    def ~>[T](elem: Pattern[T, K]) = {
-      data.foreach { d =>
-        elem.actor ! DataMessage(d)
-      }
+      PropagateDataActor(data) ! PropagateData(elem)
     }
   }
 

@@ -66,20 +66,6 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ResultToNext[K](data: List[K]) {
-    def ~>[T](elem: Pattern[T, K]) = {
-      PropagateDataActor(data) ! PropagateData(elem)
-    }
-    def ~>>(out: Out[K]) = {
-      var outRes = out.result
-      data.foreach { d =>
-        outRes :+= d
-      }
-      out.result = outRes
-      out
-    }
-  }
-
   implicit class ListBufferToNext[K](sink: ActorRef) {
     def grouped[T](size: Int) = {
       val dataIter = SinkUtils.getGroupedResults[T](sink)(size)
@@ -106,6 +92,21 @@ object WorkFlowDsl {
   implicit class ForwardIteratorDataToNext[K](data: Iterator[List[K]]) {
     def ~>[T](elem: Pattern[T, K]) = {
       PropagateDataActor(data) ! PropagateData(elem)
+    }
+  }
+
+  @deprecated("Now patterns contain Sink actors")
+  implicit class ResultToNext[K](data: List[K]) {
+    def ~>[T](elem: Pattern[T, K]) = {
+      PropagateDataActor(data) ! PropagateData(elem)
+    }
+    def ~>>(out: Out[K]) = {
+      var outRes = out.result
+      data.foreach { d =>
+        outRes :+= d
+      }
+      out.result = outRes
+      out
     }
   }
 

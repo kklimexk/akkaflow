@@ -76,8 +76,8 @@ object WorkFlowDsl {
 
   implicit class DataFromSinkToNext[K](sink: ActorRef) {
     def grouped[T](size: Int) = {
-      val dataIter = SinkUtils.getGroupedResults[T](sink)(size)
-      dataIter
+      val dataIterF = SinkUtils.getGroupedResultsAsync[T](sink)(size)
+      dataIterF
     }
     def ~>[T](elem: Pattern[T, K]) = {
       var dataF = SinkUtils.getResultsAsync[K](sink)
@@ -106,9 +106,12 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ForwardIteratorDataToNext[K](data: Iterator[List[K]]) {
+  implicit class ForwardIteratorDataToNext[K](dataF: Future[Iterator[List[K]]]) {
     def ~>[T](elem: Pattern[T, K]) = {
-      PropagateDataActor(data) ! PropagateData(elem)
+      DataState.dataList :+= dataF
+      dataF onSuccess {
+        case data: Iterator[List[K]] => PropagateDataActor(data) ! PropagateData(elem)
+      }
     }
   }
 

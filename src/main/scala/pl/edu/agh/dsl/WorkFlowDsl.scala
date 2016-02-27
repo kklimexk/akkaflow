@@ -72,6 +72,7 @@ object WorkFlowDsl {
 
   object DataState {
     var dataList = List.empty[Future[Any]]
+    var outs = List.empty[Future[Any]]
   }
 
   implicit class DataFromSinkToNext[K](sink: ActorRef) {
@@ -86,7 +87,6 @@ object WorkFlowDsl {
         case data: List[K] => PropagateDataActor(data) ! PropagateData(elem)
       }
     }
-    //TODO: Zrobic bardziej asynchronicznie
     def ~>>(out: Out[K]) = {
       val futureL = Future.sequence(DataState.dataList)
       Await.ready(futureL, Duration.Inf)
@@ -102,7 +102,8 @@ object WorkFlowDsl {
         out
       })
 
-      Await.result(outF, Duration.Inf)
+      DataState.outs :+= outF
+      Future.sequence(DataState.outs).mapTo[List[Out[K]]]
     }
   }
 

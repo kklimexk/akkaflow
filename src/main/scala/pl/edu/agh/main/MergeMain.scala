@@ -10,56 +10,58 @@ import pl.edu.agh.workflow_patterns.synchronization._
 
 object MergeMain extends App {
 
-  val sum = Action[Int, Int] { in =>
-    in + in
-  }
-
-  val sqr = Action[Int, Int] { in =>
-    in * in * in * in
-  }
-
-  val mergeAct = Action[Int, Int] { in =>
+  val action = Action[Int, Int] { in =>
     in
   }
 
-  val sumProc = Sync (
+  val firstProc = Sync (
     name = "sumProc",
     numOfOuts = 2,
-    action = sum,
+    action = action,
     sendTo = "out0"
   )
 
-  val sqrProc = Sync (
+  val secondProc = Sync (
     name = "sqrProc",
     numOfOuts = 2,
-    action = sqr,
+    action = action,
     sendTo = "out0"
+  )
+
+  val thirdProc = Sync (
+    name = "thirdProc",
+    numOfOuts = 2,
+    action = action,
+    sendTo = "out1"
   )
 
   val mergeProc = Merge (
     name = "mergeProc",
     numOfOuts = 1,
-    action = mergeAct,
+    action = action,
     sendTo = "out0"
   )
 
   val w = Workflow (
     name = "Merge example workflow",
-    numOfIns = 2,
+    numOfIns = 3,
     numOfOuts = 1,
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
-      ins(0) ~>> sqrProc
-      ins(1) ~>> sumProc
+      ins(0) ~>> firstProc
+      ins(1) ~>> secondProc
+      ins(2) ~>> thirdProc
 
-      sqrProc.outs(0) ~> mergeProc
-      sumProc.outs(0) ~> mergeProc
+      firstProc.outs(0) ~> mergeProc
+      secondProc.outs(0) ~> mergeProc
+      thirdProc.outs(1) ~> mergeProc
 
       mergeProc.outs(0) ~>> outs(0)
     }
   )
 
-  Source(1 to 4) ~> w.ins(0)
-  Source(5 to 9) ~> w.ins(1)
+  Source(1 to 20) ~> w.ins(0)
+  Source(30 to 50) ~> w.ins(1)
+  Source(70 to 90) ~> w.ins(2)
 
   val res = w.run
   println(res)

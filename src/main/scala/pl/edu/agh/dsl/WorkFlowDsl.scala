@@ -82,10 +82,10 @@ object WorkFlowDsl {
     }
     def ~>[T](elem: Pattern[T, K]) = {
       var dataF = SinkUtils.getResultsAsync[K](sink)
-      DataState.dataList :+= dataF
       dataF onSuccess {
         case data: List[K] => PropagateDataActor(data) ! PropagateData(elem)
       }
+      DataState.dataList :+= dataF
     }
     def ~>>(out: Out[K]) = {
       val futureL = Future.sequence(DataState.dataList)

@@ -39,16 +39,41 @@ case class Action4[T, K](action: (T, T, T, T) => K) extends IMultipleAction[T, K
   }
 }
 
-case class MultipleAction[T, K](action: Seq[T] => K) extends IMultipleAction[T, K] {
-
-  /*TODO: Tutaj nie dziala ponizszy kod - nie wiadomo jak zcastowac reflect.runtime.universe.Type (head) na Seq[Int]
-  if (action.isInstanceOf[Seq[Int] => Int]) {
-    ReflectionUtils.getObjectArgs(action.asInstanceOf[Seq[Int] => Int]).head.asInstanceOf[Seq[Int]].size
-  } else 0
-   */
-  var numOfIns: Int = ???
+case class Action5[T, K](action: (T, T, T, T, T) => K) extends IMultipleAction[T, K] {
+  var numOfIns: Int = 5
 
   def execute(ins: T*): K = {
+    action(ins(0), ins(1), ins(2), ins(3), ins(4))
+  }
+}
+
+case class Action6[T, K](action: (T, T, T, T, T, T) => K) extends IMultipleAction[T, K] {
+  var numOfIns: Int = 6
+
+  def execute(ins: T*): K = {
+    action(ins(0), ins(1), ins(2), ins(3), ins(4), ins(5))
+  }
+}
+
+case class Action7[T, K](action: (T, T, T, T, T, T, T) => K) extends IMultipleAction[T, K] {
+  var numOfIns: Int = 7
+
+  def execute(ins: T*): K = {
+    action(ins(0), ins(1), ins(2), ins(3), ins(4), ins(5), ins(6))
+  }
+}
+
+case class Action8[T, K](action: (T, T, T, T, T, T, T, T) => K) extends IMultipleAction[T, K] {
+  var numOfIns: Int = 8
+
+  def execute(ins: T*): K = {
+    action(ins(0), ins(1), ins(2), ins(3), ins(4), ins(5), ins(6), ins(7))
+  }
+}
+
+case class MultipleAction[T, K](var numOfIns: Int)(action: Seq[T] => K) extends IMultipleAction[T, K] {
+  def execute(ins: T*): K = {
+    assert(numOfIns == ins.size, "NumOfIns must equals to ins.size!")
     action(ins)
   }
 }

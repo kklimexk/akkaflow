@@ -40,33 +40,18 @@ object WorkFlowDsl {
     }
   }
 
+  object MSyncId {
+    var uniqueId = 0
+  }
+
   implicit class InputDataToNext[T](in: In[T]) {
     def ~>>[K](elem: Pattern[T, K]) = {
-      PropagateDataActor(in.data) ! PropagateData(elem)
-    }
-  }
-
-  implicit class TwoInputsDataToNext[T](ins: (In[T], In[T])) {
-    def ~>>[K](elem: MultipleSync[T, K]) = {
-      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
-      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
-    }
-  }
-
-  implicit class ThreeInputsDataToNext[T](ins: (In[T], In[T], In[T])) {
-    def ~>>[K](elem: MultipleSync[T, K]) = {
-      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
-      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
-      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 2)
-    }
-  }
-
-  implicit class FourInputsDataToNext[T](ins: (In[T], In[T], In[T], In[T])) {
-    def ~>>[K](elem: MultipleSync[T, K]) = {
-      PropagateDataForMultipleSyncActor(ins._1.data) ! PropagateDataForMultipleSync(elem, 0)
-      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 1)
-      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 2)
-      PropagateDataForMultipleSyncActor(ins._2.data) ! PropagateDataForMultipleSync(elem, 3)
+      elem match {
+        case e: MultipleSync[T, K] =>
+          PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId)
+          MSyncId.uniqueId += 1
+        case _ => PropagateDataActor(in.data) ! PropagateData(elem)
+      }
     }
   }
 
@@ -83,7 +68,12 @@ object WorkFlowDsl {
     def ~>[T](elem: Pattern[T, K]) = {
       var dataF = SinkUtils.getResultsAsync[K](sink)
       dataF onSuccess {
-        case data: List[K] => PropagateDataActor(data) ! PropagateData(elem)
+        case data: List[K] => elem match {
+          case e: MultipleSync[T, K] =>
+            PropagateDataForMultipleSyncActor(data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId)
+            MSyncId.uniqueId += 1
+          case _ => PropagateDataActor(data) ! PropagateData(elem)
+        }
       }
       DataState.dataList :+= dataF
     }

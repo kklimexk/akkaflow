@@ -36,7 +36,8 @@ object MultipleSyncMain extends App {
     numOfIns = 2,
     numOfOuts = 1,
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
-      (ins(0), ins(1)) ~>> sumProc
+      ins(0) ~>> sumProc
+      ins(1) ~>> sumProc
       sumProc.outs(0) ~>> outs(0)
     }
   )

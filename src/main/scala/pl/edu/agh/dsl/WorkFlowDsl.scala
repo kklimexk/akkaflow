@@ -15,11 +15,6 @@ import scala.concurrent.{Await, Future}
 object WorkFlowDsl {
 
   implicit class SourceDataToWorkflow(source: Source) {
-    /*def ~>(workflow: Workflow) = {
-      source.data.foreach { d =>
-        workflow.in.data :+= d
-      }
-    }*/
     def ~>(in: In[Int]) = {
       source.data.foreach { d =>
         in.data :+= d
@@ -28,12 +23,15 @@ object WorkFlowDsl {
   }
 
   implicit class StrSourceDataToWorkflow(source: StringSource) {
-    /*def ~>(workflow: Workflow) = {
-      source.data.foreach { d =>
-        workflow.in.data :+= d
-      }
-    }*/
     def ~>(in: In[String]) = {
+      source.data.foreach { d =>
+        in.data :+= d
+      }
+    }
+  }
+
+  implicit class AnyValSourceDataToWorkflow[T <: AnyVal](source: AnyValSource[T]) {
+    def ~>(in: In[T]) = {
       source.data.foreach { d =>
         in.data :+= d
       }

@@ -2,6 +2,8 @@ package pl.edu.agh.workflow_patterns
 
 import akka.actor.ActorRef
 
-trait Pattern[T, K] {
+trait IPattern
+
+trait Pattern[T, K] extends IPattern {
   val actor: ActorRef
 }

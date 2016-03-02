@@ -5,7 +5,7 @@ import pl.edu.agh.data_propagators.{PropagateDataForMultipleSyncActor, Propagate
 import pl.edu.agh.flows._
 import pl.edu.agh.messages._
 import pl.edu.agh.utils.SinkUtils
-import pl.edu.agh.workflow_patterns.Pattern
+import pl.edu.agh.workflow_patterns.{IPattern, Pattern}
 import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -56,6 +56,7 @@ object WorkFlowDsl {
   object DataState {
     var dataList = List.empty[Future[Any]]
     var outs = List.empty[Future[Any]]
+    var prevPattern: Option[IPattern] = None
   }
 
   implicit class DataFromSinkToNext[K](sink: ActorRef) {
@@ -64,6 +65,10 @@ object WorkFlowDsl {
       dataIterF
     }
     def ~>[T](elem: Pattern[T, K]) = {
+      if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
+        val futureL = Future.sequence(DataState.dataList)
+        Await.ready(futureL, Duration.Inf)
+      }
       var dataF = SinkUtils.getResultsAsync[K](sink)
       dataF onSuccess {
         case data: List[K] => elem match {
@@ -73,6 +78,7 @@ object WorkFlowDsl {
           case _ => PropagateDataActor(data) ! PropagateData(elem)
         }
       }
+      DataState.prevPattern = Some(elem)
       DataState.dataList :+= dataF
     }
     def ~>>(out: Out[K]) = {

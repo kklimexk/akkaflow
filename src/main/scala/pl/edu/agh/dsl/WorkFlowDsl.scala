@@ -1,5 +1,7 @@
 package pl.edu.agh.dsl
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import akka.actor.ActorRef
 import pl.edu.agh.data_propagators.{PropagateDataForMultipleSyncActor, PropagateDataActor}
 import pl.edu.agh.flows._
@@ -39,15 +41,14 @@ object WorkFlowDsl {
   }
 
   object MSyncId {
-    var uniqueId = 0
+    var uniqueId = new AtomicInteger(0)
   }
 
   implicit class InputDataToNext[T](in: In[T]) {
     def ~>>[K](elem: Pattern[T, K]) = {
       elem match {
         case e: MultipleSync[T, K] =>
-          PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId)
-          MSyncId.uniqueId += 1
+          PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
         case _ => PropagateDataActor(in.data) ! PropagateData(elem)
       }
     }
@@ -73,8 +74,7 @@ object WorkFlowDsl {
       dataF onSuccess {
         case data: List[K] => elem match {
           case e: MultipleSync[T, K] =>
-            PropagateDataForMultipleSyncActor(data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId)
-            MSyncId.uniqueId += 1
+            PropagateDataForMultipleSyncActor(data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
           case _ => PropagateDataActor(data) ! PropagateData(elem)
         }
       }

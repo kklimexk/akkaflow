@@ -7,12 +7,11 @@ import pl.edu.agh.utils.Utils.crc32
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.utils.ActorUtils._
+import pl.edu.agh.workflow_patterns.merge.Merge
 
 object ChoiceMain extends App {
 
-  val action = Action[String, String] { in =>
-    in
-  }
+  val action = Action[String, String](identity)
 
   val choiceProc = Choice[String, String] (
     name = "choice",
@@ -21,16 +20,26 @@ object ChoiceMain extends App {
     d => crc32(d)
   )
 
+  val mergeProc = Merge[String, String] (
+    name = "merge",
+    numOfOuts = 2,
+    action = action,
+    sendTo = "out1"
+  )
+
   val w = Workflow (
     "Example Choice Workflow",
     numOfIns = 2,
-    numOfOuts = 3,
+    numOfOuts = 1,
     (ins: Seq[In[String]], outs: Seq[Out[String]]) => {
       ins(0) ~>> choiceProc
       ins(1) ~>> choiceProc
-      choiceProc.outs(0) ~>> outs(0)
-      choiceProc.outs(1) ~>> outs(1)
-      choiceProc.outs(2) ~>> outs(2)
+
+      choiceProc.outs(0) ~> mergeProc
+      choiceProc.outs(1) ~> mergeProc
+      choiceProc.outs(2) ~> mergeProc
+
+      mergeProc.outs(1) ~>> outs(0)
     }
   )
 

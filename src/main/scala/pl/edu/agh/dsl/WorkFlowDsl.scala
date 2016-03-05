@@ -60,13 +60,11 @@ object WorkFlowDsl {
   implicit class InputDataToNext[T](in: In[T]) {
     def ~>>[R](elem: Pattern[T, R]) = {
       val f = Future.sequence(SourceDataState.sourceDataFList)
-      f onSuccess {
-        case _ =>
-          elem match {
-            case e: MultipleSync[T, R] =>
-              PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
-            case _ => PropagateDataActor(in.data) ! PropagateData(elem)
-          }
+      if (!f.isCompleted) Await.ready(f, Duration.Inf)
+      elem match {
+        case e: MultipleSync[T, R] =>
+          PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
+        case _ => PropagateDataActor(in.data) ! PropagateData(elem)
       }
     }
   }
@@ -82,6 +80,7 @@ object WorkFlowDsl {
       val dataIterF = SinkUtils.getGroupedResultsAsync[T](sink)(size)
       dataIterF
     }
+
     def ~>[T](elem: Pattern[T, R]) = {
       if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
         val futureL = Future.sequence(DataState.dataList)
@@ -98,6 +97,7 @@ object WorkFlowDsl {
       DataState.prevPattern = Some(elem)
       DataState.dataList :+= dataF
     }
+
     def ~>>(out: Out[R]) = {
       val futureL = Future.sequence(DataState.dataList)
       Await.ready(futureL, Duration.Inf)
@@ -120,10 +120,15 @@ object WorkFlowDsl {
 
   implicit class ForwardIteratorDataToNext[R](dataF: Future[Iterator[List[R]]]) {
     def ~>[T](elem: Pattern[T, R]) = {
-      DataState.dataList :+= dataF
+      if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
+        val futureL = Future.sequence(DataState.dataList)
+        Await.ready(futureL, Duration.Inf)
+      }
       dataF onSuccess {
         case data: Iterator[List[R]] => PropagateDataActor(data) ! PropagateData(elem)
       }
+      DataState.prevPattern = Some(elem)
+      DataState.dataList :+= dataF
     }
   }
 
@@ -132,6 +137,7 @@ object WorkFlowDsl {
     def ~>[T](elem: Pattern[T, R]) = {
       PropagateDataActor(data) ! PropagateData(elem)
     }
+
     def ~>>(out: Out[R]) = {
       var outRes = out.result
       data.foreach { d =>

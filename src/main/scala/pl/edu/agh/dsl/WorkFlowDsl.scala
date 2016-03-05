@@ -16,27 +16,40 @@ import scala.concurrent.{Await, Future}
 
 object WorkFlowDsl {
 
+  object SourceDataState {
+    var sourceDataFList = List.empty[Future[Any]]
+  }
+
   implicit class SourceDataToWorkflow(source: Source) {
     def ~>(in: In[Int]) = {
-      source.data.foreach { d =>
-        in.data :+= d
+      val f = Future {
+        source.data.foreach { d =>
+          in.data :+= d
+        }
       }
+      SourceDataState.sourceDataFList :+= f
     }
   }
 
   implicit class StrSourceDataToWorkflow(source: StringSource) {
     def ~>(in: In[String]) = {
-      source.data.foreach { d =>
-        in.data :+= d
+      val f = Future {
+        source.data.foreach { d =>
+          in.data :+= d
+        }
       }
+      SourceDataState.sourceDataFList :+= f
     }
   }
 
   implicit class AnyValSourceDataToWorkflow[T <: AnyVal](source: AnyValSource[T]) {
     def ~>(in: In[T]) = {
-      source.data.foreach { d =>
-        in.data :+= d
+      val f = Future {
+        source.data.foreach { d =>
+          in.data :+= d
+        }
       }
+      SourceDataState.sourceDataFList :+= f
     }
   }
 
@@ -46,10 +59,14 @@ object WorkFlowDsl {
 
   implicit class InputDataToNext[T](in: In[T]) {
     def ~>>[R](elem: Pattern[T, R]) = {
-      elem match {
-        case e: MultipleSync[T, R] =>
-          PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
-        case _ => PropagateDataActor(in.data) ! PropagateData(elem)
+      val f = Future.sequence(SourceDataState.sourceDataFList)
+      f onSuccess {
+        case _ =>
+          elem match {
+            case e: MultipleSync[T, R] =>
+              PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
+            case _ => PropagateDataActor(in.data) ! PropagateData(elem)
+          }
       }
     }
   }

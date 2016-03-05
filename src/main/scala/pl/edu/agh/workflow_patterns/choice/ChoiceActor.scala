@@ -6,12 +6,12 @@ import pl.edu.agh.flows.Sink
 import pl.edu.agh.messages.{ResultMessage, Get, DataMessage}
 
 //Choice Pattern
-class ChoiceActor[T, K](numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) extends Actor with ChoiceProcess[T, K] with ActorLogging {
+class ChoiceActor[T, R](numOfOuts: Int, action: ISingleAction[T, R], choiceFunc: R => Int) extends Actor with ChoiceProcess[T, R] with ActorLogging {
 
   protected var _outs = {
     var outsSeq = Seq.empty[ActorRef]
     for (i <- 0 until numOfOuts) {
-      outsSeq :+= Sink[K]("out" + i, context)
+      outsSeq :+= Sink[R]("out" + i, context)
     }
     outsSeq
   }
@@ -34,6 +34,6 @@ class ChoiceActor[T, K](numOfOuts: Int, action: ISingleAction[T, K], choiceFunc:
 object ChoiceActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T, K](name: String, numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) = system.actorOf(ChoiceActor.props(numOfOuts, action, choiceFunc), name)
-  def props[T, K](numOfOuts: Int, action: ISingleAction[T, K], choiceFunc: K => Int) = Props(classOf[ChoiceActor[T, K]], numOfOuts, action, choiceFunc)
+  def apply[T, R](name: String, numOfOuts: Int, action: ISingleAction[T, R], choiceFunc: R => Int) = system.actorOf(ChoiceActor.props(numOfOuts, action, choiceFunc), name)
+  def props[T, R](numOfOuts: Int, action: ISingleAction[T, R], choiceFunc: R => Int) = Props(classOf[ChoiceActor[T, R]], numOfOuts, action, choiceFunc)
 }

@@ -4,6 +4,6 @@ import akka.actor.ActorRef
 
 trait IPattern
 
-trait Pattern[T, K] extends IPattern {
+trait Pattern[T, R] extends IPattern {
   val actor: ActorRef
 }

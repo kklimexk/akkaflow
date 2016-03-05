@@ -9,12 +9,12 @@ import akka.actor.{ActorRef, Props, ActorLogging, Actor}
 import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.messages._
 
-class MultipleSyncActor[T, K](numOfOuts: Int, multipleAction: IMultipleAction[T, K], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends Actor with SyncProcess[K] with ActorLogging {
+class MultipleSyncActor[T, R](numOfOuts: Int, multipleAction: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends Actor with SyncProcess[R] with ActorLogging {
 
   protected var _outs = {
     var outsSeq = Seq.empty[ActorRef]
     for (i <- 0 until numOfOuts) {
-      outsSeq :+= Sink[K]("out" + i, context)
+      outsSeq :+= Sink[R]("out" + i, context)
     }
     outsSeq
   }
@@ -58,6 +58,6 @@ class MultipleSyncActor[T, K](numOfOuts: Int, multipleAction: IMultipleAction[T,
 object MultipleSyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T, K](name: String, numOfOuts: Int, action: IMultipleAction[T, K], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = system.actorOf(MultipleSyncActor.props(numOfOuts, action, sendTo, syncPoints), name)
-  def props[T, K](numOfOuts: Int, action: IMultipleAction[T, K], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = Props(classOf[MultipleSyncActor[T, K]], numOfOuts, action, sendTo, syncPoints)
+  def apply[T, R](name: String, numOfOuts: Int, action: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = system.actorOf(MultipleSyncActor.props(numOfOuts, action, sendTo, syncPoints), name)
+  def props[T, R](numOfOuts: Int, action: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = Props(classOf[MultipleSyncActor[T, R]], numOfOuts, action, sendTo, syncPoints)
 }

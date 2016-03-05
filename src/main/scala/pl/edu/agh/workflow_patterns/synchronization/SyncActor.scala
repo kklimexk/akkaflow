@@ -6,12 +6,12 @@ import pl.edu.agh.flows.Sink
 import pl.edu.agh.messages._
 
 //Synchronization Pattern
-class SyncActor[T, K](numOfOuts: Int, action: ISingleAction[T, K], sendTo: String) extends Actor with SyncProcess[K] with ActorLogging {
+class SyncActor[T, R](numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) extends Actor with SyncProcess[R] with ActorLogging {
 
   protected var _outs = {
     var outsSeq = Seq.empty[ActorRef]
     for (i <- 0 until numOfOuts) {
-      outsSeq :+= Sink[K]("out" + i, context)
+      outsSeq :+= Sink[R]("out" + i, context)
     }
     outsSeq
   }
@@ -31,6 +31,6 @@ class SyncActor[T, K](numOfOuts: Int, action: ISingleAction[T, K], sendTo: Strin
 object SyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T, K](name: String, numOfOuts: Int, action: ISingleAction[T, K], sendTo: String) = system.actorOf(SyncActor.props(numOfOuts, action, sendTo), name)
-  def props[T, K](numOfOuts: Int, action: ISingleAction[T, K], sendTo: String) = Props(classOf[SyncActor[T, K]], numOfOuts, action, sendTo)
+  def apply[T, R](name: String, numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) = system.actorOf(SyncActor.props(numOfOuts, action, sendTo), name)
+  def props[T, R](numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) = Props(classOf[SyncActor[T, R]], numOfOuts, action, sendTo)
 }

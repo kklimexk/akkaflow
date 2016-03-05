@@ -10,32 +10,32 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import akka.pattern.ask
 
 object SinkUtils {
-  def getResults[K](sink: ActorRef) = {
+  def getResults[R](sink: ActorRef) = {
     import pl.edu.agh.utils.ActorUtils.{system, timeout}
 
     val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetOut)
-    val data = Await.result(dataF, Duration.Inf).asInstanceOf[List[K]]
+    val data = Await.result(dataF, Duration.Inf).asInstanceOf[List[R]]
 
     data
   }
-  def getGroupedResults[K](sink: ActorRef)(size: Int) = {
+  def getGroupedResults[R](sink: ActorRef)(size: Int) = {
     import pl.edu.agh.utils.ActorUtils.{system, timeout}
 
     val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetGroupedOut(size))
-    val data = Await.result(dataF, Duration.Inf).asInstanceOf[Iterator[List[K]]]
+    val data = Await.result(dataF, Duration.Inf).asInstanceOf[Iterator[List[R]]]
 
     data
   }
-  def getResultsAsync[K](sink: ActorRef) = {
+  def getResultsAsync[R](sink: ActorRef) = {
     import pl.edu.agh.utils.ActorUtils.{system, timeout}
 
     val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetOut)
-    dataF.mapTo[List[K]]
+    dataF.mapTo[List[R]]
   }
-  def getGroupedResultsAsync[K](sink: ActorRef)(size: Int) = {
+  def getGroupedResultsAsync[R](sink: ActorRef)(size: Int) = {
     import pl.edu.agh.utils.ActorUtils.{system, timeout}
 
     val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetGroupedOut(size))
-    dataF.mapTo[Iterator[List[K]]]
+    dataF.mapTo[Iterator[List[R]]]
   }
 }

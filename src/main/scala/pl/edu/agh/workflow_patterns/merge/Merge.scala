@@ -4,10 +4,10 @@ import pl.edu.agh.actions.ISingleAction
 import pl.edu.agh.workflow_patterns.Pattern
 
 //Merge
-class Merge[T, K](name: String, numOfOuts: Int, action: ISingleAction[T, K], sendTo: String) extends Pattern[T, K] {
+class Merge[T, R](name: String, numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) extends Pattern[T, R] {
   override lazy val actor = MergeActor(name, numOfOuts, action, sendTo)
 }
 
 object Merge {
-  def apply[T, K](name: String, numOfOuts: Int, action: ISingleAction[T, K], sendTo: String) = new Merge[T, K](name, numOfOuts, action, sendTo)
+  def apply[T, R](name: String, numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) = new Merge[T, R](name, numOfOuts, action, sendTo)
 }

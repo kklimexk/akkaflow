@@ -5,5 +5,5 @@ import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
 
 sealed trait PropagateDataMessage
 
-case class PropagateData[T, K](elem: Pattern[T, K]) extends PropagateDataMessage
-case class PropagateDataForMultipleSync[T, K](elem: MultipleSync[T, K], uniqueId: Int) extends PropagateDataMessage
+case class PropagateData[T, R](elem: Pattern[T, R]) extends PropagateDataMessage
+case class PropagateDataForMultipleSync[T, R](elem: MultipleSync[T, R], uniqueId: Int) extends PropagateDataMessage

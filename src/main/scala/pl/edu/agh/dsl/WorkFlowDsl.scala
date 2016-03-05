@@ -45,9 +45,9 @@ object WorkFlowDsl {
   }
 
   implicit class InputDataToNext[T](in: In[T]) {
-    def ~>>[K](elem: Pattern[T, K]) = {
+    def ~>>[R](elem: Pattern[T, R]) = {
       elem match {
-        case e: MultipleSync[T, K] =>
+        case e: MultipleSync[T, R] =>
           PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
         case _ => PropagateDataActor(in.data) ! PropagateData(elem)
       }
@@ -60,20 +60,20 @@ object WorkFlowDsl {
     var prevPattern: Option[IPattern] = None
   }
 
-  implicit class DataFromSinkToNext[K](sink: ActorRef) {
+  implicit class DataFromSinkToNext[R](sink: ActorRef) {
     def grouped[T](size: Int) = {
       val dataIterF = SinkUtils.getGroupedResultsAsync[T](sink)(size)
       dataIterF
     }
-    def ~>[T](elem: Pattern[T, K]) = {
+    def ~>[T](elem: Pattern[T, R]) = {
       if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
         val futureL = Future.sequence(DataState.dataList)
         Await.ready(futureL, Duration.Inf)
       }
-      var dataF = SinkUtils.getResultsAsync[K](sink)
+      var dataF = SinkUtils.getResultsAsync[R](sink)
       dataF onSuccess {
-        case data: List[K] => elem match {
-          case e: MultipleSync[T, K] =>
+        case data: List[R] => elem match {
+          case e: MultipleSync[T, R] =>
             PropagateDataForMultipleSyncActor(data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
           case _ => PropagateDataActor(data) ! PropagateData(elem)
         }
@@ -81,11 +81,11 @@ object WorkFlowDsl {
       DataState.prevPattern = Some(elem)
       DataState.dataList :+= dataF
     }
-    def ~>>(out: Out[K]) = {
+    def ~>>(out: Out[R]) = {
       val futureL = Future.sequence(DataState.dataList)
       Await.ready(futureL, Duration.Inf)
 
-      val dataF = SinkUtils.getResultsAsync[K](sink)
+      val dataF = SinkUtils.getResultsAsync[R](sink)
 
       val outF = dataF.map(data => {
         var outRes = out.result
@@ -97,25 +97,25 @@ object WorkFlowDsl {
       })
 
       DataState.outs :+= outF
-      Future.sequence(DataState.outs).mapTo[List[Out[K]]]
+      Future.sequence(DataState.outs).mapTo[List[Out[R]]]
     }
   }
 
-  implicit class ForwardIteratorDataToNext[K](dataF: Future[Iterator[List[K]]]) {
-    def ~>[T](elem: Pattern[T, K]) = {
+  implicit class ForwardIteratorDataToNext[R](dataF: Future[Iterator[List[R]]]) {
+    def ~>[T](elem: Pattern[T, R]) = {
       DataState.dataList :+= dataF
       dataF onSuccess {
-        case data: Iterator[List[K]] => PropagateDataActor(data) ! PropagateData(elem)
+        case data: Iterator[List[R]] => PropagateDataActor(data) ! PropagateData(elem)
       }
     }
   }
 
   @deprecated("Now patterns contain Sink actors")
-  implicit class ResultToNext[K](data: List[K]) {
-    def ~>[T](elem: Pattern[T, K]) = {
+  implicit class ResultToNext[R](data: List[R]) {
+    def ~>[T](elem: Pattern[T, R]) = {
       PropagateDataActor(data) ! PropagateData(elem)
     }
-    def ~>>(out: Out[K]) = {
+    def ~>>(out: Out[R]) = {
       var outRes = out.result
       data.foreach { d =>
         outRes :+= d

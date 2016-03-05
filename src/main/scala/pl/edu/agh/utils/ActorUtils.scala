@@ -26,20 +26,20 @@ object ActorUtils {
       Await.result(actorF, timeout.duration).asInstanceOf[WorkflowProcess]
     }
 
-    def toSyncActor[T, K]: SyncActor[T, K] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, K]]
+    def toSyncActor[T, R]: SyncActor[T, R] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, R]]
     }
 
-    def toMultipleSyncActor[T, K]: MultipleSyncActor[T, K] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[MultipleSyncActor[T, K]]
+    def toMultipleSyncActor[T, R]: MultipleSyncActor[T, R] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[MultipleSyncActor[T, R]]
     }
 
-    def toChoiceActor[T, K]: ChoiceActor[T, K] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T, K]]
+    def toChoiceActor[T, R]: ChoiceActor[T, R] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T, R]]
     }
 
-    def toMergeActor[T, K]: MergeActor[T, K] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T, K]]
+    def toMergeActor[T, R]: MergeActor[T, R] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T, R]]
     }
 
     /*def out: List[Int] = {
@@ -53,8 +53,8 @@ object ActorUtils {
     }*/
 
   }
-  implicit def convertSyncToSyncActor[T, K](sync: Sync[T, K]): SyncActor[T, K] = sync.actor.toSyncActor
-  implicit def convertMultipleSyncToMultipleSyncActor[T, K](mSync: MultipleSync[T, K]): MultipleSyncActor[T, K] = mSync.actor.toMultipleSyncActor
-  implicit def convertChoiceToChoiceActor[T, K](choice: Choice[T, K]): ChoiceActor[T, K] = choice.actor.toChoiceActor
-  implicit def convertMergeToMergeActor[T, K](merge: Merge[T, K]): MergeActor[T, K] = merge.actor.toMergeActor
+  implicit def convertSyncToSyncActor[T, R](sync: Sync[T, R]): SyncActor[T, R] = sync.actor.toSyncActor
+  implicit def convertMultipleSyncToMultipleSyncActor[T, R](mSync: MultipleSync[T, R]): MultipleSyncActor[T, R] = mSync.actor.toMultipleSyncActor
+  implicit def convertChoiceToChoiceActor[T, R](choice: Choice[T, R]): ChoiceActor[T, R] = choice.actor.toChoiceActor
+  implicit def convertMergeToMergeActor[T, R](merge: Merge[T, R]): MergeActor[T, R] = merge.actor.toMergeActor
 }

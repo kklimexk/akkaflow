@@ -5,9 +5,9 @@ import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.{Out, In, Source}
 import pl.edu.agh.utils.ActorUtils._
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns.synchronization._
+import pl.edu.agh.workflow_patterns.merge.Merge
 
-object SyncMain extends App {
+object FirstTest extends App {
 
   val sqr = Action[Int, Int] { in =>
     in * in
@@ -17,14 +17,14 @@ object SyncMain extends App {
     in.reduceLeft[Int](_+_)
   }
 
-  val sqrProc = Sync (
+  val sqrProc = Merge (
     name = "sqrProc",
     numOfOuts = 2,
     action = sqr,
     sendTo = "out1"
   )
 
-  val sumProc = Sync (
+  val sumProc = Merge (
     name = "sumProc",
     numOfOuts = 2,
     action = sum,

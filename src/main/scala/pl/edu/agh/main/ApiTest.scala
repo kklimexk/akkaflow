@@ -8,7 +8,7 @@ import pl.edu.agh.utils.ActorUtils._
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.split.Split
-import pl.edu.agh.workflow_patterns.synchronization.{Sync, MultipleSync}
+import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
 
 object ApiTest extends App {
 
@@ -20,7 +20,7 @@ object ApiTest extends App {
     "%.2f".format(in0.toDouble / in1.toDouble).toDouble
   }
 
-  val syncAct = Action[Double, String] { in =>
+  val mergeAct2 = Action[Double, String] { in =>
     in.toString
   }
 
@@ -45,10 +45,10 @@ object ApiTest extends App {
     sendTo = "out2"
   )
 
-  val syncProc = Sync[Double, String] (
-    name = "syncProc",
+  val mergeProc2 = Merge[Double, String] (
+    name = "mergeProc2",
     numOfOuts = 3,
-    action = syncAct,
+    action = mergeAct2,
     sendTo = "out1"
   )
 
@@ -72,9 +72,9 @@ object ApiTest extends App {
       choiceProc.outs(0) ~> multipleSyncProc
       choiceProc.outs(1) ~> multipleSyncProc
 
-      multipleSyncProc.outs(2) ~> syncProc
+      multipleSyncProc.outs(2) ~> mergeProc2
 
-      syncProc.outs(1) ~> splitProc
+      mergeProc2.outs(1) ~> splitProc
 
       splitProc.outs(0) ~>> outs(0)
       splitProc.outs(1) ~>> outs(1)

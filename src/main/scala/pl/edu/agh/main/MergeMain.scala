@@ -6,7 +6,6 @@ import pl.edu.agh.flows.{Out, In, Source}
 import pl.edu.agh.utils.ActorUtils._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
-import pl.edu.agh.workflow_patterns.synchronization._
 
 object MergeMain extends App {
 
@@ -14,21 +13,21 @@ object MergeMain extends App {
     in
   }
 
-  val firstProc = Sync (
+  val firstProc = Merge (
     name = "sumProc",
     numOfOuts = 2,
     action = action,
     sendTo = "out0"
   )
 
-  val secondProc = Sync (
+  val secondProc = Merge (
     name = "sqrProc",
     numOfOuts = 2,
     action = action,
     sendTo = "out0"
   )
 
-  val thirdProc = Sync (
+  val thirdProc = Merge (
     name = "thirdProc",
     numOfOuts = 2,
     action = action,

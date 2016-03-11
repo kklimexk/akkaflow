@@ -5,6 +5,7 @@ import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.{Out, In, Source}
 import pl.edu.agh.utils.ActorUtils._
 import pl.edu.agh.workflow.Workflow
+import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.synchronization._
 
 object MultipleSyncMain extends App {
@@ -24,7 +25,7 @@ object MultipleSyncMain extends App {
     sendTo = "out0"
   )
 
-  val mulProc = Sync (
+  val mulProc = Merge (
     name = "mulProc",
     numOfOuts = 1,
     action = mul,

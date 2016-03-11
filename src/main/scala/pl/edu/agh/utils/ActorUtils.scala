@@ -9,7 +9,7 @@ import pl.edu.agh.workflow_patterns.WorkflowProcess
 import pl.edu.agh.workflow_patterns.choice.{Choice, ChoiceActor}
 import pl.edu.agh.workflow_patterns.merge.{MergeActor, Merge}
 import pl.edu.agh.workflow_patterns.split.{Split, SplitActor}
-import pl.edu.agh.workflow_patterns.synchronization.{MultipleSync, MultipleSyncActor}
+import pl.edu.agh.workflow_patterns.synchronization.{Sync, SyncActor}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -27,8 +27,8 @@ object ActorUtils {
       Await.result(actorF, timeout.duration).asInstanceOf[WorkflowProcess]
     }
 
-    def toMultipleSyncActor[T, R]: MultipleSyncActor[T, R] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[MultipleSyncActor[T, R]]
+    def toSyncActor[T, R]: SyncActor[T, R] = {
+      Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, R]]
     }
 
     def toChoiceActor[T, R]: ChoiceActor[T, R] = {
@@ -54,7 +54,7 @@ object ActorUtils {
     }*/
 
   }
-  implicit def convertMultipleSyncToMultipleSyncActor[T, R](mSync: MultipleSync[T, R]): MultipleSyncActor[T, R] = mSync.actor.toMultipleSyncActor
+  implicit def convertSyncToSyncActor[T, R](mSync: Sync[T, R]): SyncActor[T, R] = mSync.actor.toSyncActor
   implicit def convertChoiceToChoiceActor[T, R](choice: Choice[T, R]): ChoiceActor[T, R] = choice.actor.toChoiceActor
   implicit def convertMergeToMergeActor[T, R](merge: Merge[T, R]): MergeActor[T, R] = merge.actor.toMergeActor
   implicit def convertSplitToSplitActor[T, R](split: Split[T, R]): SplitActor[T, R] = split.actor.toSplitActor

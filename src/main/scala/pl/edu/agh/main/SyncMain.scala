@@ -8,7 +8,7 @@ import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.synchronization._
 
-object MultipleSyncMain extends App {
+object SyncMain extends App {
 
   val sum = Action2[Int, Int] { (in1, in2) =>
     in1 + in2
@@ -18,7 +18,7 @@ object MultipleSyncMain extends App {
     in.reduceLeft[Int](_*_)
   }
 
-  val sumProc = MultipleSync (
+  val sumProc = Sync (
     name = "sumProc",
     numOfOuts = 2,
     action = sum,

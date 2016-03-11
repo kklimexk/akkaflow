@@ -3,9 +3,9 @@ package pl.edu.agh.data_propagators
 import akka.actor.{Actor, Props}
 import pl.edu.agh.messages._
 
-class PropagateDataForMultipleSyncActor[T](data: T) extends Actor {
+class PropagateDataForSyncActor[T](data: T) extends Actor {
   def receive = {
-    case PropagateDataForMultipleSync(elem, uId) =>
+    case PropagateDataForSync(elem, uId) =>
       data match {
         case res: TraversableOnce[T] =>
           res.foreach { d =>
@@ -16,9 +16,9 @@ class PropagateDataForMultipleSyncActor[T](data: T) extends Actor {
   }
 }
 
-object PropagateDataForMultipleSyncActor {
+object PropagateDataForSyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T](data: T) = system.actorOf(PropagateDataForMultipleSyncActor.props(data))
-  def props[T](data: T) = Props(classOf[PropagateDataForMultipleSyncActor[T]], data)
+  def apply[T](data: T) = system.actorOf(PropagateDataForSyncActor.props(data))
+  def props[T](data: T) = Props(classOf[PropagateDataForSyncActor[T]], data)
 }

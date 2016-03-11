@@ -8,7 +8,7 @@ import pl.edu.agh.utils.ActorUtils._
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.split.Split
-import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
+import pl.edu.agh.workflow_patterns.synchronization.Sync
 
 object ApiTest extends App {
 
@@ -38,7 +38,7 @@ object ApiTest extends App {
     d => d
   )
 
-  val multipleSyncProc = MultipleSync[Int, Double] (
+  val multipleSyncProc = Sync[Int, Double] (
     name = "multipleSyncProc",
     numOfOuts = 3,
     action = multipleSyncAct,

@@ -3,12 +3,12 @@ package pl.edu.agh.dsl
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.ActorRef
-import pl.edu.agh.data_propagators.{PropagateDataForMultipleSyncActor, PropagateDataActor}
+import pl.edu.agh.data_propagators.{PropagateDataForSyncActor, PropagateDataActor}
 import pl.edu.agh.flows._
 import pl.edu.agh.messages._
 import pl.edu.agh.utils.SinkUtils
 import pl.edu.agh.workflow_patterns.{IPattern, Pattern}
-import pl.edu.agh.workflow_patterns.synchronization.MultipleSync
+import pl.edu.agh.workflow_patterns.synchronization.Sync
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
@@ -62,8 +62,8 @@ object WorkFlowDsl {
       val f = Future.sequence(SourceDataState.sourceDataFList)
       if (!f.isCompleted) Await.ready(f, Duration.Inf)
       elem match {
-        case e: MultipleSync[T, R] =>
-          PropagateDataForMultipleSyncActor(in.data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
+        case e: Sync[T, R] =>
+          PropagateDataForSyncActor(in.data) ! PropagateDataForSync(e, MSyncId.uniqueId.getAndIncrement())
         case _ => PropagateDataActor(in.data) ! PropagateData(elem)
       }
     }
@@ -89,8 +89,8 @@ object WorkFlowDsl {
       var dataF = SinkUtils.getResultsAsync[R](sink)
       dataF onSuccess {
         case data: List[R] => elem match {
-          case e: MultipleSync[T, R] =>
-            PropagateDataForMultipleSyncActor(data) ! PropagateDataForMultipleSync(e, MSyncId.uniqueId.getAndIncrement())
+          case e: Sync[T, R] =>
+            PropagateDataForSyncActor(data) ! PropagateDataForSync(e, MSyncId.uniqueId.getAndIncrement())
           case _ => PropagateDataActor(data) ! PropagateData(elem)
         }
       }

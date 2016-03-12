@@ -5,7 +5,7 @@ import akka.util.Timeout
 import akka.pattern.ask
 
 import pl.edu.agh.messages.Get
-import pl.edu.agh.workflow_patterns.WorkflowProcess
+import pl.edu.agh.workflow_patterns.PatternActor
 import pl.edu.agh.workflow_patterns.choice.{Choice, ChoiceActor}
 import pl.edu.agh.workflow_patterns.merge.{MergeActor, Merge}
 import pl.edu.agh.workflow_patterns.split.{Split, SplitActor}
@@ -23,8 +23,8 @@ object ActorUtils {
 
     lazy val actorF = actorRef ? Get
 
-    def toWorkflowProcess: WorkflowProcess = {
-      Await.result(actorF, timeout.duration).asInstanceOf[WorkflowProcess]
+    def toPatternActor: PatternActor = {
+      Await.result(actorF, timeout.duration).asInstanceOf[PatternActor]
     }
 
     def toSyncActor[T, R]: SyncActor[T, R] = {

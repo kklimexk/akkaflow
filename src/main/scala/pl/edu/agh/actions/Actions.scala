@@ -1,6 +1,8 @@
 package pl.edu.agh.actions
 
-abstract class IAction[T, R] {
+trait Transformation
+
+abstract class IAction[T, R] extends Transformation {
   var numOfIns: Int
   def execute(ins: T*): R
 }

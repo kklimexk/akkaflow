@@ -1,10 +1,11 @@
 package pl.edu.agh.workflow_patterns.split
 
-import akka.actor.{ActorLogging, Props, Actor}
+import akka.actor.{ActorLogging, Props}
 import pl.edu.agh.actions.ISingleAction
 import pl.edu.agh.messages.{ResultMessage, DataMessage, Get}
+import pl.edu.agh.workflow_patterns.{PatternOuts, PatternActor}
 
-class SplitActor[T, R](val numOfOuts: Int, action: ISingleAction[T, R]) extends Actor with SplitProcess[T, R] with ActorLogging {
+class SplitActor[T, R](numOfOuts: Int, action: ISingleAction[T, R]) extends PatternActor(numOfOuts, action) with PatternOuts[R] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
       val res = action.execute(data)

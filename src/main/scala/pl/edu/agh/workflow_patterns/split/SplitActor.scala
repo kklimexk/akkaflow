@@ -1,22 +1,10 @@
 package pl.edu.agh.workflow_patterns.split
 
-import akka.actor.{ActorLogging, Props, ActorRef, Actor}
+import akka.actor.{ActorLogging, Props, Actor}
 import pl.edu.agh.actions.ISingleAction
-import pl.edu.agh.flows.Sink
 import pl.edu.agh.messages.{ResultMessage, DataMessage, Get}
 
-class SplitActor[T, R](numOfOuts: Int, action: ISingleAction[T, R]) extends Actor with SplitProcess[R] with ActorLogging {
-
-  protected var _outs = {
-    var outsSeq = Seq.empty[ActorRef]
-    for (i <- 0 until numOfOuts) {
-      outsSeq :+= Sink[R]("out" + i, context)
-    }
-    outsSeq
-  }
-
-  def outs = _outs
-
+class SplitActor[T, R](val numOfOuts: Int, action: ISingleAction[T, R]) extends Actor with SplitProcess[T, R] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
       val res = action.execute(data)

@@ -1,26 +1,14 @@
 package pl.edu.agh.workflow_patterns.synchronization
 
 import java.util.concurrent.ConcurrentLinkedQueue
-import pl.edu.agh.flows.Sink
 
 import scala.util.control.Breaks._
 
-import akka.actor.{ActorRef, Props, ActorLogging, Actor}
+import akka.actor.{Props, ActorLogging, Actor}
 import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.messages._
 
-class SyncActor[T, R](numOfOuts: Int, multipleAction: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends Actor with SyncProcess[R] with ActorLogging {
-
-  protected var _outs = {
-    var outsSeq = Seq.empty[ActorRef]
-    for (i <- 0 until numOfOuts) {
-      outsSeq :+= Sink[R]("out" + i, context)
-    }
-    outsSeq
-  }
-
-  def outs = _outs
-
+class SyncActor[T, R](val numOfOuts: Int, multipleAction: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends Actor with SyncProcess[T, R] with ActorLogging {
   def receive = {
     case SyncDataMessage(data: T, uId) =>
       syncPoints(uId).offer(data)

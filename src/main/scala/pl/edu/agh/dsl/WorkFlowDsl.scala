@@ -15,6 +15,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 object WorkFlowDsl {
+  import pl.edu.agh.utils.ActorUtils.Implicits.maxTimeForRes
 
   object SourceDataState {
     var sourceDataFList = List.empty[Future[Any]]

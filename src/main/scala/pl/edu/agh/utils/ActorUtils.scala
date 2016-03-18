@@ -17,45 +17,50 @@ import scala.concurrent.duration._
 object ActorUtils {
 
   val system = ActorSystem("ActorSystem")
-  implicit val timeout = Timeout(5 seconds)
 
-  implicit class ConverterToActor(actorRef: ActorRef) {
+  object Implicits {
 
-    lazy val actorF = actorRef ? Get
+    implicit val maxTimeForRes = 100
+    implicit val timeout = Timeout(5 seconds)
 
-    def toPatternActor: PatternActor = {
-      Await.result(actorF, timeout.duration).asInstanceOf[PatternActor]
+    implicit class ConverterToActor(actorRef: ActorRef) {
+
+      lazy val actorF = actorRef ? Get
+
+      def toPatternActor: PatternActor = {
+        Await.result(actorF, timeout.duration).asInstanceOf[PatternActor]
+      }
+
+      def toSyncActor[T, R]: SyncActor[T, R] = {
+        Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, R]]
+      }
+
+      def toChoiceActor[T, R]: ChoiceActor[T, R] = {
+        Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T, R]]
+      }
+
+      def toMergeActor[T, R]: MergeActor[T, R] = {
+        Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T, R]]
+      }
+
+      def toSplitActor[T, R]: SplitActor[T, R] = {
+        Await.result(actorF, timeout.duration).asInstanceOf[SplitActor[T, R]]
+      }
+
+      /*def out: List[Int] = {
+        val actor = actorRef.toWorkflowProcess
+        actor.out
+      }*/
+
+      /*def outs: List[List[Int]] = {
+        val actor = actorRef.toChoiceActor
+        List(actor.out1, actor.out2, actor.out3)
+      }*/
+
     }
-
-    def toSyncActor[T, R]: SyncActor[T, R] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, R]]
-    }
-
-    def toChoiceActor[T, R]: ChoiceActor[T, R] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T, R]]
-    }
-
-    def toMergeActor[T, R]: MergeActor[T, R] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T, R]]
-    }
-
-    def toSplitActor[T, R]: SplitActor[T, R] = {
-      Await.result(actorF, timeout.duration).asInstanceOf[SplitActor[T, R]]
-    }
-
-    /*def out: List[Int] = {
-      val actor = actorRef.toWorkflowProcess
-      actor.out
-    }*/
-
-    /*def outs: List[List[Int]] = {
-      val actor = actorRef.toChoiceActor
-      List(actor.out1, actor.out2, actor.out3)
-    }*/
-
+    implicit def convertSyncToSyncActor[T, R](mSync: Sync[T, R]): SyncActor[T, R] = mSync.actor.toSyncActor
+    implicit def convertChoiceToChoiceActor[T, R](choice: Choice[T, R]): ChoiceActor[T, R] = choice.actor.toChoiceActor
+    implicit def convertMergeToMergeActor[T, R](merge: Merge[T, R]): MergeActor[T, R] = merge.actor.toMergeActor
+    implicit def convertSplitToSplitActor[T, R](split: Split[T, R]): SplitActor[T, R] = split.actor.toSplitActor
   }
-  implicit def convertSyncToSyncActor[T, R](mSync: Sync[T, R]): SyncActor[T, R] = mSync.actor.toSyncActor
-  implicit def convertChoiceToChoiceActor[T, R](choice: Choice[T, R]): ChoiceActor[T, R] = choice.actor.toChoiceActor
-  implicit def convertMergeToMergeActor[T, R](merge: Merge[T, R]): MergeActor[T, R] = merge.actor.toMergeActor
-  implicit def convertSplitToSplitActor[T, R](split: Split[T, R]): SplitActor[T, R] = split.actor.toSplitActor
 }

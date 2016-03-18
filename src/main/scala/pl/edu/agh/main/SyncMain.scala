@@ -3,7 +3,7 @@ package pl.edu.agh.main
 import pl.edu.agh.actions.{Action, Action2}
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.{Out, In, Source}
-import pl.edu.agh.utils.ActorUtils._
+import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.synchronization._

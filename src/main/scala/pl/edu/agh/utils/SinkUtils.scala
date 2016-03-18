@@ -2,6 +2,7 @@ package pl.edu.agh.utils
 
 import akka.actor.ActorRef
 import pl.edu.agh.messages.{GetGroupedOut, GetOut}
+import pl.edu.agh.utils.ActorUtils.system
 
 import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
@@ -10,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import akka.pattern.ask
 
 object SinkUtils {
-  import pl.edu.agh.utils.ActorUtils.{system, timeout}
+  import pl.edu.agh.utils.ActorUtils.Implicits._
 
   def getResults[R](sink: ActorRef) = {
     val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetOut)
@@ -24,7 +25,7 @@ object SinkUtils {
 
     data
   }
-  def getResultsAsync[R](sink: ActorRef) = {
+  def getResultsAsync[R](sink: ActorRef)(implicit maxTimeForRes: Int) = {
     def f = Future {
       var res = List.empty[R]
       var time = 0
@@ -35,13 +36,13 @@ object SinkUtils {
           case None => time += 10
           case r: R => res :+= r; time = 0
         }
-        if (time >= 100) resultsNotReady = false
+        if (time >= maxTimeForRes) resultsNotReady = false
       }
       res
     }
     f
   }
-  def getGroupedResultsAsync[R](sink: ActorRef)(size: Int) = {
+  def getGroupedResultsAsync[R](sink: ActorRef)(size: Int)(implicit maxTimeForRes: Int) = {
     def f = Future {
       var res = List.empty[List[R]]
       var time = 0
@@ -52,7 +53,7 @@ object SinkUtils {
           case None => time += 10
           case r: List[R] => res :+= r; time = 0
         }
-        if (time >= 100) resultsNotReady = false
+        if (time >= maxTimeForRes) resultsNotReady = false
       }
       res
     }

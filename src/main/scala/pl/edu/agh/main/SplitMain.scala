@@ -4,7 +4,7 @@ import pl.edu.agh.actions.Action
 import pl.edu.agh.flows.{Source, Out, In}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.split.Split
-import pl.edu.agh.utils.ActorUtils._
+import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
 
 object SplitMain extends App {

@@ -118,14 +118,14 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class ForwardIteratorDataToNext[R](dataF: Future[Iterator[List[R]]]) {
+  implicit class ForwardIteratorDataToNext[R](dataF: Future[List[List[R]]]) {
     def ~>[T](elem: Pattern[T, R]) = {
       if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
         val futureL = Future.sequence(DataState.dataList)
         Await.ready(futureL, Duration.Inf)
       }
       dataF onSuccess {
-        case data: Iterator[List[R]] => PropagateDataActor(data) ! PropagateData(elem)
+        case data: List[List[R]] => PropagateDataActor(data) ! PropagateData(elem)
       }
       DataState.prevPattern = Some(elem)
       DataState.dataList :+= dataF

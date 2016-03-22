@@ -2,11 +2,11 @@ package pl.edu.agh.workflow_patterns.choice
 
 import akka.actor.{ActorLogging, Props}
 import pl.edu.agh.actions.ISingleAction
-import pl.edu.agh.messages.{ResultMessage, Get, DataMessage}
+import pl.edu.agh.messages.{ChangeAction, ResultMessage, Get, DataMessage}
 import pl.edu.agh.workflow_patterns.{PatternOuts, PatternActor}
 
 //Choice Pattern
-class ChoiceActor[T, R](numOfOuts: Int, action: ISingleAction[T, R], choiceFunc: R => Int) extends PatternActor(numOfOuts, action) with PatternOuts[R] with ActorLogging {
+class ChoiceActor[T, R](numOfOuts: Int, var action: ISingleAction[T, R], choiceFunc: R => Int) extends PatternActor(numOfOuts, action) with PatternOuts[R] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
       val res = action.execute(data)
@@ -14,6 +14,8 @@ class ChoiceActor[T, R](numOfOuts: Int, action: ISingleAction[T, R], choiceFunc:
       val i = choiceFunc(res) % _outs.length
 
       _outs(i) ! ResultMessage(res)
+    case ChangeAction(act: ISingleAction[T, R]) =>
+      action = act
     case Get =>
       sender ! this
   }

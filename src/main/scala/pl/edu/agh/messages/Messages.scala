@@ -1,8 +1,8 @@
 package pl.edu.agh.messages
 
-import akka.actor.ActorRef
+import pl.edu.agh.actions.Transformation
 
 sealed trait Message
 
-case class Dest(actor: ActorRef) extends Message
 case object Get extends Message
+case class ChangeAction(action: Transformation) extends Message

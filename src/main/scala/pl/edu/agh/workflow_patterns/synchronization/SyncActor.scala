@@ -10,7 +10,7 @@ import akka.actor.{Props, ActorLogging}
 import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.messages._
 
-class SyncActor[T, R](numOfOuts: Int, multipleAction: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends PatternActor(numOfOuts, multipleAction) with PatternOuts[R] with ActorLogging {
+class SyncActor[T, R](numOfOuts: Int, var multipleAction: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends PatternActor(numOfOuts, multipleAction) with PatternOuts[R] with ActorLogging {
   def receive = {
     case SyncDataMessage(data: T, uId) =>
       syncPoints(uId).offer(data)
@@ -38,7 +38,8 @@ class SyncActor[T, R](numOfOuts: Int, multipleAction: IMultipleAction[T, R], sen
         val res = multipleAction.execute(sync:_*)
         context.actorSelection(self.path + "/" + sendTo) ! ResultMessage(res)
       }
-
+    case ChangeAction(act: IMultipleAction[T, R]) =>
+      multipleAction = act
     case Get =>
       sender ! this
   }

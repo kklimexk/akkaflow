@@ -9,7 +9,8 @@ import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
 
 /** Prosty test sprawdzajacy, czy da się uzyc tego samego wezla wiecej niz jeden raz
-  * oraz czy mozna zmienic akcje gdy uzyjemy wezla po raz drugi
+  * oraz czy mozna zmienic akcje gdy uzyjemy wezla po raz drugi i czy mozna
+  * zmienic wyjscie na ktore wysyla sie wynik
   * */
 object ReusableTest extends App {
 
@@ -43,13 +44,15 @@ object ReusableTest extends App {
 
       mergeProc.outs(1) ~> splitProc
 
+      mergeProc sendTo "out0"
+
       splitProc.outs(0) ~> mergeProc
       splitProc.outs(1) ~> mergeProc
       splitProc.outs(2) ~> mergeProc
 
       splitProc changeActionOn Action(identity)
 
-      mergeProc.outs(1) ~> splitProc
+      mergeProc.outs(0) ~> splitProc
 
       splitProc.outs(0) ~>> outs(0)
       splitProc.outs(1) ~>> outs(1)

@@ -2,10 +2,10 @@ package pl.edu.agh.workflow_patterns.merge
 
 import akka.actor.{Props, ActorLogging}
 import pl.edu.agh.actions.ISingleAction
-import pl.edu.agh.messages.{ChangeAction, ResultMessage, DataMessage, Get}
+import pl.edu.agh.messages._
 import pl.edu.agh.workflow_patterns.{PatternOuts, PatternActor}
 
-class MergeActor[T, R](numOfOuts: Int, var action: ISingleAction[T, R], sendTo: String) extends PatternActor(numOfOuts, action) with PatternOuts[R] with ActorLogging {
+class MergeActor[T, R](numOfOuts: Int, var action: ISingleAction[T, R], var sendTo: String) extends PatternActor(numOfOuts, action) with PatternOuts[R] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
       //log.info("DATA: {}", data)
@@ -13,6 +13,8 @@ class MergeActor[T, R](numOfOuts: Int, var action: ISingleAction[T, R], sendTo: 
       context.actorSelection(self.path + "/" + sendTo) ! ResultMessage(res)
     case ChangeAction(act: ISingleAction[T, R]) =>
       action = act
+    case ChangeSendTo(outName) =>
+      sendTo = outName
     case Get =>
       sender ! this
   }

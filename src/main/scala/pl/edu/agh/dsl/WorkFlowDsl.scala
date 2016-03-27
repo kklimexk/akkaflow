@@ -43,8 +43,19 @@ object WorkFlowDsl {
     }
   }
 
-  implicit class AnyValSourceDataToWorkflow[T <: AnyVal](source: AnyValSource[T]) {
-    def ~>(in: In[T]) = {
+  implicit class AnyRangeSourceDataToWorkflow(source: AnyRangeSource) {
+    def ~>(in: In[Any]) = {
+      val f = Future {
+        source.data.foreach { d =>
+          in.data :+= d
+        }
+      }
+      SourceDataState.sourceDataFList :+= f
+    }
+  }
+
+  implicit class AnySourceDataToWorkflow(source: AnySource) {
+    def ~>(in: In[Any]) = {
       val f = Future {
         source.data.foreach { d =>
           in.data :+= d

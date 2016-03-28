@@ -17,7 +17,7 @@ object ChoiceMain extends App {
     name = "choice",
     numOfOuts = 3,
     action = action,
-    d => crc32(d)
+    (d: String) => crc32(d)
   )
 
   val mergeProc = Merge[String, String] (

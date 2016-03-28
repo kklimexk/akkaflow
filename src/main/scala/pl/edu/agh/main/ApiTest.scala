@@ -34,8 +34,8 @@ object ApiTest extends App {
   val choiceProc = Choice[Int, Int] (
     name = "choiceProc",
     numOfOuts = 2,
-    action = Action(identity),
-    d => d
+    action = Action[Int, Int](identity),
+    (d: Int) => d
   )
 
   val multipleSyncProc = Sync[Int, Double] (
@@ -54,8 +54,8 @@ object ApiTest extends App {
 
   val splitProc = Split[String, String] (
     name = "splitProc",
-    numOfOuts = 3,
-    action = Action(identity)
+    outs = Seq("wyj1", "wyj2", "wyj3"),
+    action = Action[String, String](identity)
   )
 
   val w = Workflow (
@@ -76,9 +76,9 @@ object ApiTest extends App {
 
       mergeProc2.outs(1) ~> splitProc
 
-      splitProc.outs(0) ~>> outs(0)
-      splitProc.outs(1) ~>> outs(1)
-      splitProc.outs(2) ~>> outs(2)
+      splitProc.outs("wyj1") ~>> outs(0)
+      splitProc.outs("wyj2") ~>> outs(1)
+      splitProc.outs("wyj3") ~>> outs(2)
     }
   )
 

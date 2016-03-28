@@ -10,7 +10,7 @@ import akka.actor.{Props, ActorLogging}
 import pl.edu.agh.actions.IMultipleAction
 import pl.edu.agh.messages._
 
-class SyncActor[T, R](numOfOuts: Int, var multipleAction: IMultipleAction[T, R], var sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends PatternActor(numOfOuts, multipleAction) with PatternOuts[R] with ActorLogging {
+class SyncActor[T, R](numOfOuts: Int, outs: Seq[String], var multipleAction: IMultipleAction[T, R], var sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends PatternActor(numOfOuts, outs, multipleAction) with PatternOuts[R] with ActorLogging {
   def receive = {
     case SyncDataMessage(data: T, uId) =>
       syncPoints(uId).offer(data)
@@ -51,6 +51,6 @@ class SyncActor[T, R](numOfOuts: Int, var multipleAction: IMultipleAction[T, R],
 object SyncActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T, R](name: String, numOfOuts: Int, action: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = system.actorOf(SyncActor.props(numOfOuts, action, sendTo, syncPoints), name)
-  def props[T, R](numOfOuts: Int, action: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = Props(classOf[SyncActor[T, R]], numOfOuts, action, sendTo, syncPoints)
+  def apply[T, R](name: String, numOfOuts: Int, outs: Seq[String], action: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = system.actorOf(SyncActor.props(numOfOuts, outs, action, sendTo, syncPoints), name)
+  def props[T, R](numOfOuts: Int, outs: Seq[String], action: IMultipleAction[T, R], sendTo: String, syncPoints: Seq[ConcurrentLinkedQueue[T]]) = Props(classOf[SyncActor[T, R]], numOfOuts, outs, action, sendTo, syncPoints)
 }

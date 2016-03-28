@@ -19,9 +19,9 @@ object FirstTest extends App {
 
   val sqrProc = Merge (
     name = "sqrProc",
-    numOfOuts = 2,
+    outs = Seq("o1", "output2"),
     action = sqr,
-    sendTo = "out1"
+    sendTo = "o1"
   )
 
   val sumProc = Merge (
@@ -35,7 +35,7 @@ object FirstTest extends App {
     "Sum of Squares workflow",
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       ins(0) ~>> sqrProc
-      sqrProc.outs(1).grouped(3) ~> sumProc
+      sqrProc.outs("o1").grouped(3) ~> sumProc
       sumProc.outs(0) ~>> outs(0)
     }
   )

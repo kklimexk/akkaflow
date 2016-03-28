@@ -11,5 +11,10 @@ trait PatternOuts[R] { actor: PatternActor =>
     }
     outsSeq
   }
+  protected var userDefinedOuts = {
+    val outsMap: Map[String, ActorRef] = outputs.map(o => o -> Sink[R](o, actor.context))(collection.breakOut)
+    outsMap
+  }
   def outs = _outs
+  def outs(name: String) = userDefinedOuts(name)
 }

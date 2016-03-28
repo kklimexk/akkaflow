@@ -5,7 +5,7 @@ import pl.edu.agh.actions.ISingleAction
 import pl.edu.agh.messages._
 import pl.edu.agh.workflow_patterns.{PatternOuts, PatternActor}
 
-class MergeActor[T, R](numOfOuts: Int, var action: ISingleAction[T, R], var sendTo: String) extends PatternActor(numOfOuts, action) with PatternOuts[R] with ActorLogging {
+class MergeActor[T, R](numOfOuts: Int, outs: Seq[String], var action: ISingleAction[T, R], var sendTo: String) extends PatternActor(numOfOuts, outs, action) with PatternOuts[R] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
       //log.info("DATA: {}", data)
@@ -23,6 +23,6 @@ class MergeActor[T, R](numOfOuts: Int, var action: ISingleAction[T, R], var send
 object MergeActor {
   import pl.edu.agh.utils.ActorUtils.system
 
-  def apply[T, R](name: String, numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) = system.actorOf(MergeActor.props(numOfOuts, action, sendTo), name)
-  def props[T, R](numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) = Props(classOf[MergeActor[T, R]], numOfOuts, action, sendTo)
+  def apply[T, R](name: String, numOfOuts: Int, outs: Seq[String], action: ISingleAction[T, R], sendTo: String) = system.actorOf(MergeActor.props(numOfOuts, outs, action, sendTo), name)
+  def props[T, R](numOfOuts: Int, outs: Seq[String], action: ISingleAction[T, R], sendTo: String) = Props(classOf[MergeActor[T, R]], numOfOuts, outs, action, sendTo)
 }

@@ -36,9 +36,9 @@ object AnyTypeInputTest extends App {
 
   val sumSyncProc = Sync (
     name = "sumProc",
-    numOfOuts = 2,
+    outs = Seq("sumOut_1", "sumOut_2"),
     action = sumOnlyNumbers,
-    sendTo = "out0"
+    sendTo = "sumOut_1"
   )
 
   val splitProc = Split (
@@ -49,9 +49,9 @@ object AnyTypeInputTest extends App {
 
   val mergeProc = Merge (
     name = "mergeProc",
-    numOfOuts = 2,
+    outs = Seq("firstOut", "secondOut"),
     action = sum,
-    sendTo = "out1"
+    sendTo = "secondOut"
   )
 
   val w = Workflow (
@@ -63,9 +63,9 @@ object AnyTypeInputTest extends App {
       ins(1) ~>> sumSyncProc
       ins(2) ~>> sumSyncProc
 
-      sumSyncProc.outs(0).grouped(10) ~> mergeProc
+      sumSyncProc.outs("sumOut_1").grouped(10) ~> mergeProc
 
-      mergeProc.outs(1) ~> splitProc
+      mergeProc.outs("secondOut") ~> splitProc
 
       splitProc.outs(0) ~>> outs(0)
       splitProc.outs(1) ~>> outs(1)

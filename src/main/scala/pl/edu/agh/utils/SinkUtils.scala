@@ -2,61 +2,44 @@ package pl.edu.agh.utils
 
 import akka.actor.ActorRef
 import pl.edu.agh.messages.{GetGroupedOut, GetOut}
-import pl.edu.agh.utils.ActorUtils.system
 
-import scala.concurrent.{Future, Await}
+import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.pattern.ask
 
 object SinkUtils {
-  import pl.edu.agh.utils.ActorUtils.Implicits._
-
   def getResults[R](sink: ActorRef) = {
+    import pl.edu.agh.utils.ActorUtils._
+    import pl.edu.agh.utils.ActorUtils.Implicits._
+
     val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetOut)
     val data = Await.result(dataF, Duration.Inf).asInstanceOf[List[R]]
 
     data
   }
   def getGroupedResults[R](sink: ActorRef)(size: Int) = {
+    import pl.edu.agh.utils.ActorUtils._
+    import pl.edu.agh.utils.ActorUtils.Implicits._
+
     val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetGroupedOut(size))
     val data = Await.result(dataF, Duration.Inf).asInstanceOf[Iterator[List[R]]]
 
     data
   }
-  def getResultsAsync[R](sink: ActorRef)(implicit maxTimeForRes: Int) = {
-    def f = Future {
-      var res = List.empty[R]
-      var time = 0
-      var resultsNotReady = true
-      while (resultsNotReady) {
-        val f = akka.pattern.after(time milliseconds, using = system.scheduler)(sink ? GetOut)
-        Await.result(f, Duration.Inf) match {
-          case None => time += 10
-          case r: R => res :+= r; time = 0
-        }
-        if (time >= maxTimeForRes) resultsNotReady = false
-      }
-      res
-    }
-    f
+  def getResultsAsync[R](sink: ActorRef) = {
+    import pl.edu.agh.utils.ActorUtils._
+    import pl.edu.agh.utils.ActorUtils.Implicits._
+
+    val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetOut)
+    dataF.mapTo[List[R]]
   }
-  def getGroupedResultsAsync[R](sink: ActorRef)(size: Int)(implicit maxTimeForRes: Int) = {
-    def f = Future {
-      var res = List.empty[List[R]]
-      var time = 0
-      var resultsNotReady = true
-      while (resultsNotReady) {
-        val f = akka.pattern.after(time milliseconds, using = system.scheduler)(sink ? GetGroupedOut(size))
-        Await.result(f, Duration.Inf) match {
-          case None => time += 10
-          case r: List[R] => res :+= r; time = 0
-        }
-        if (time >= maxTimeForRes) resultsNotReady = false
-      }
-      res
-    }
-    f
+  def getGroupedResultsAsync[R](sink: ActorRef)(size: Int) = {
+    import pl.edu.agh.utils.ActorUtils._
+    import pl.edu.agh.utils.ActorUtils.Implicits._
+
+    val dataF = akka.pattern.after(200 milliseconds, using = system.scheduler)(sink ? GetGroupedOut(size))
+    dataF.mapTo[Iterator[List[R]]]
   }
 }

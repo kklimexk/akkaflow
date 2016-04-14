@@ -1,6 +1,6 @@
 name := """workflow-patterns"""
 
-version := "4.0"
+version := "4.1"
 
 scalaVersion := "2.11.7"
 

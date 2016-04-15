@@ -1,7 +1,7 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.{Action2, Action}
-import pl.edu.agh.flows.{Source, Out, In}
+import pl.edu.agh.actions.{Action, MultipleAction}
+import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.utils.ActorUtils.Implicits._
@@ -16,8 +16,8 @@ object ApiTest extends App {
     in * in
   }
 
-  val multipleSyncAct = Action2[Int, Double] { (in0, in1) =>
-    "%.2f".format(in0.toDouble / in1.toDouble).toDouble
+  val multipleSyncAct = MultipleAction[Int, Double](numOfIns = 2) { ins =>
+    "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble
   }
 
   val mergeAct2 = Action[Double, String] { in =>

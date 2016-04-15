@@ -1,8 +1,8 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.{Action, Action2}
+import pl.edu.agh.actions.{Action, MultipleAction}
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows.{Out, In, Source}
+import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
@@ -10,8 +10,8 @@ import pl.edu.agh.workflow_patterns.synchronization._
 
 object SyncMain extends App {
 
-  val sum = Action2[Int, Int] { (in1, in2) =>
-    in1 + in2
+  val sum = MultipleAction[Int, Int](numOfIns = 2) { ins =>
+    ins(0) + ins(1)
   }
 
   val mul = Action[List[Int], Int] { in =>

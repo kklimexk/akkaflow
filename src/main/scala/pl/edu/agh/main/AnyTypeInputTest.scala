@@ -1,6 +1,6 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.{Action3, Action}
+import pl.edu.agh.actions.{Action, MultipleAction}
 import pl.edu.agh.flows._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
@@ -23,13 +23,13 @@ object AnyTypeInputTest extends App {
     res
   }
 
-  val sumOnlyNumbers = Action3[Any, Any] { (in1, in2, in3) =>
-    val res = (in1, in2, in3) match {
+  val sumOnlyNumbers = MultipleAction[Any, Any](numOfIns = 3) { ins =>
+    val res = (ins(0), ins(1), ins(2)) match {
       case (i1: Int, i2: Int, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Double, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Int, i3: Double) => i1 + i2 + i3
       case (i1: Int, i2: String, i3: Double) => i1 + i3
-      case _ => identity(in1, in2, in3)
+      case _ => identity(ins(0), ins(1), ins(2))
     }
     res
   }

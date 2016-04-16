@@ -1,6 +1,5 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.{Action, MultipleAction}
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.dsl.WorkFlowDsl._
@@ -16,7 +15,7 @@ object ApiTest extends App {
     in * in
   }
 
-  val multipleSyncAct = MultipleAction[Int, Double](numOfIns = 2) { ins =>
+  val multipleSyncAct = { ins: Seq[Int] =>
     "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble
   }
 
@@ -40,6 +39,7 @@ object ApiTest extends App {
 
   val multipleSyncProc = Sync[Int, Double] (
     name = "multipleSyncProc",
+    numOfIns = 2,
     numOfOuts = 3,
     action = multipleSyncAct,
     sendTo = "out2"

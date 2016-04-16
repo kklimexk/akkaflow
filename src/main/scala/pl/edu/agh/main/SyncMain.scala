@@ -1,6 +1,5 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.{Action, MultipleAction}
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
@@ -10,7 +9,7 @@ import pl.edu.agh.workflow_patterns.synchronization._
 
 object SyncMain extends App {
 
-  val sum = MultipleAction[Int, Int](numOfIns = 2) { ins =>
+  val sum = { ins: Seq[Int] =>
     ins(0) + ins(1)
   }
 
@@ -20,6 +19,7 @@ object SyncMain extends App {
 
   val sumProc = Sync (
     name = "sumProc",
+    numOfIns = 2,
     numOfOuts = 2,
     action = sum,
     sendTo = "out0"

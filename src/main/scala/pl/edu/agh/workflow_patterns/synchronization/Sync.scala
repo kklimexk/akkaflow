@@ -2,23 +2,23 @@ package pl.edu.agh.workflow_patterns.synchronization
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import pl.edu.agh.actions.{IMultipleAction, INamedMultipleAction, IUnnamedMultipleAction}
+import pl.edu.agh.actions.{ActionConverter, IMultipleAction, INamedMultipleAction, IUnnamedMultipleAction}
 import pl.edu.agh.workflow_patterns.Pattern
 
 //Sync Pattern with multiple inputs
-class Sync[T, R](name: String, numOfOuts: Int, ins: Seq[String], outs: Seq[String], action: IMultipleAction[T, R], sendTo: String) extends Pattern[T, R] {
+class Sync[T, R](name: String, numOfIns: Int, numOfOuts: Int, ins: Seq[String], outs: Seq[String], action: IMultipleAction[T, R], sendTo: String) extends Pattern[T, R] {
 
   //Ewentualnie mozna uzyc LinkedBlockingQueue
   val syncPointsQueues = {
     var res = Seq.empty[ConcurrentLinkedQueue[T]]
-    var numOfIns: Int = 0
+    var insCount: Int = 0
     action match {
-      case act: IUnnamedMultipleAction[T, R] =>
-        numOfIns = act.numOfIns
+      case _: IUnnamedMultipleAction[T, R] =>
+        insCount = numOfIns
       case _: INamedMultipleAction[T, R] =>
-        numOfIns = ins.size
+        insCount = ins.size
     }
-    for (i <- 0 until numOfIns) {
+    for (i <- 0 until insCount) {
       res :+= new ConcurrentLinkedQueue[T]()
     }
     res
@@ -28,9 +28,8 @@ class Sync[T, R](name: String, numOfOuts: Int, ins: Seq[String], outs: Seq[Strin
 }
 
 object Sync {
-  def apply[T, R](name: String, numOfOuts: Int, action: IMultipleAction[T, R], sendTo: String) = new Sync[T, R](name, numOfOuts, Seq.empty, Seq.empty, action, sendTo)
-  def apply[T, R](name: String, outs: Seq[String], action: IMultipleAction[T, R], sendTo: String) = new Sync[T, R](name, 0, Seq.empty, outs, action, sendTo)
-
-  def apply[T, R](name: String, numOfOuts: Int, ins: Seq[String], action: IMultipleAction[T, R], sendTo: String) = new Sync[T, R](name, numOfOuts, ins, Seq.empty, action, sendTo)
-  def apply[T, R](name: String, ins: Seq[String], outs: Seq[String], action: IMultipleAction[T, R], sendTo: String) = new Sync[T, R](name, 0, ins, outs, action, sendTo)
+  def apply[T, R](name: String, numOfIns: Int, numOfOuts: Int, action: Seq[T] => R, sendTo: String) = new Sync[T, R](name, numOfIns, numOfOuts, Seq.empty, Seq.empty, ActionConverter(action), sendTo)
+  def apply[T, R](name: String, numOfIns: Int, outs: Seq[String], action: Seq[T] => R, sendTo: String)(implicit d: DummyImplicit) = new Sync[T, R](name, numOfIns, 0, Seq.empty, outs, ActionConverter(action), sendTo)
+  def apply[T, R](name: String, numOfOuts: Int, ins: Seq[String], action: Map[String, T] => R, sendTo: String) = new Sync[T, R](name, 0, numOfOuts, ins, Seq.empty, ActionConverter(action), sendTo)
+  def apply[T, R](name: String, ins: Seq[String], outs: Seq[String], action: Map[String, T] => R, sendTo: String) = new Sync[T, R](name, 0, 0, ins, outs, ActionConverter(action), sendTo)
 }

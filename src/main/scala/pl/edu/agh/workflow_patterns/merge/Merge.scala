@@ -1,6 +1,6 @@
 package pl.edu.agh.workflow_patterns.merge
 
-import pl.edu.agh.actions.ISingleAction
+import pl.edu.agh.actions.{ActionConverter, ISingleAction}
 import pl.edu.agh.workflow_patterns.Pattern
 
 //Merge
@@ -9,6 +9,6 @@ class Merge[T, R](name: String, numOfOuts: Int, outs: Seq[String], action: ISing
 }
 
 object Merge {
-  def apply[T, R](name: String, numOfOuts: Int, action: ISingleAction[T, R], sendTo: String) = new Merge[T, R](name, numOfOuts, Seq.empty, action, sendTo)
-  def apply[T, R](name: String, outs: Seq[String], action: ISingleAction[T, R], sendTo: String) = new Merge[T, R](name, 0, outs, action, sendTo)
+  def apply[T, R](name: String, numOfOuts: Int, action: T => R, sendTo: String) = new Merge[T, R](name, numOfOuts, Seq.empty, ActionConverter(action), sendTo)
+  def apply[T, R](name: String, outs: Seq[String], action: T => R, sendTo: String) = new Merge[T, R](name, 0, outs, ActionConverter(action), sendTo)
 }

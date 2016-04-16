@@ -9,7 +9,7 @@ import pl.edu.agh.workflow_patterns.merge.Merge
 
 object MergeMain extends App {
 
-  val action = Action[Int, Int] { in =>
+  val action = { in: Int =>
     in
   }
 

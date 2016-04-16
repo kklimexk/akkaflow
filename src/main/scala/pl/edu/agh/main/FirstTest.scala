@@ -1,6 +1,5 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.Action
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.{Out, In, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
@@ -9,11 +8,11 @@ import pl.edu.agh.workflow_patterns.merge.Merge
 
 object FirstTest extends App {
 
-  val sqr = Action[Int, Int] { in =>
+  val sqr = { in: Int =>
     in * in
   }
 
-  val sum = Action[List[Int], Int] { in =>
+  val sum = { in: List[Int] =>
     in.reduceLeft[Int](_+_)
   }
 

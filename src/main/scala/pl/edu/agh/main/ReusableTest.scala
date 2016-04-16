@@ -21,14 +21,14 @@ object ReusableTest extends App {
   val mergeProc = Merge[Int, Int] (
     name = "mergeProc",
     numOfOuts = 2,
-    action = Action[Int, Int](identity),
+    action = { in: Int => in },
     sendTo = "out1"
   )
 
   val splitProc = Split[Int, Int] (
     name = "splitProc",
     numOfOuts = 3,
-    action = Action[Int, Int](identity)
+    action = { in: Int => in }
   )
 
   val w = Workflow (

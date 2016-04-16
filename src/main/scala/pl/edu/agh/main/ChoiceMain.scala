@@ -11,7 +11,7 @@ import pl.edu.agh.workflow_patterns.merge.Merge
 
 object ChoiceMain extends App {
 
-  val action = Action[String, String](identity)
+  val action = { in: String => in }
 
   val choiceProc = Choice[String, String] (
     name = "choice",

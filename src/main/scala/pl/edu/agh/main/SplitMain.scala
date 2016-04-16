@@ -9,7 +9,7 @@ import pl.edu.agh.dsl.WorkFlowDsl._
 
 object SplitMain extends App {
 
-  val sqr = Action[Int, Int] { in =>
+  val sqr = { in: Int =>
     in * in
   }
 

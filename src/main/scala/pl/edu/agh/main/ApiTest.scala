@@ -12,7 +12,7 @@ import pl.edu.agh.workflow_patterns.synchronization.Sync
 
 object ApiTest extends App {
 
-  val mergeAct = Action[Int, Int] { in =>
+  val mergeAct = { in: Int =>
     in * in
   }
 
@@ -20,7 +20,7 @@ object ApiTest extends App {
     "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble
   }
 
-  val mergeAct2 = Action[Double, String] { in =>
+  val mergeAct2 = { in: Double =>
     in.toString
   }
 
@@ -34,7 +34,7 @@ object ApiTest extends App {
   val choiceProc = Choice[Int, Int] (
     name = "choiceProc",
     numOfOuts = 2,
-    action = Action[Int, Int](identity),
+    action = identity(_: Int),
     (d: Int) => d
   )
 
@@ -55,7 +55,7 @@ object ApiTest extends App {
   val splitProc = Split[String, String] (
     name = "splitProc",
     outs = Seq("wyj1", "wyj2", "wyj3"),
-    action = Action[String, String](identity)
+    action = { in: String => in }
   )
 
   val w = Workflow (

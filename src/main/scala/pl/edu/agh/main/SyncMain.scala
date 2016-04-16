@@ -14,7 +14,7 @@ object SyncMain extends App {
     ins(0) + ins(1)
   }
 
-  val mul = Action[List[Int], Int] { in =>
+  val mul = { in: List[Int] =>
     in.reduceLeft[Int](_*_)
   }
 

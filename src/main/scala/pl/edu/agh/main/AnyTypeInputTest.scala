@@ -1,6 +1,6 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.{Action, NamedMultipleAction}
+import pl.edu.agh.actions.NamedMultipleAction
 import pl.edu.agh.flows._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
@@ -12,9 +12,9 @@ import pl.edu.agh.workflow_patterns.synchronization.Sync
 /** Prosty test majacy sprawdzic czy mozna uzyc roznych typow danych dla wejsc */
 object AnyTypeInputTest extends App {
 
-  val act = Action[Any, Any](identity)
+  val act = identity(_: Any)
 
-  val sum = Action[List[Any], Any] { in =>
+  val sum = { in: List[Any] =>
     val res = in match {
       case i: List[Double] => i.reduceLeft[Double](_+_)
       case i: List[Int] => i.reduceLeft[Int](_+_)

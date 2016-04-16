@@ -1,6 +1,6 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.{Action, MultipleAction}
+import pl.edu.agh.actions.{Action, NamedMultipleAction}
 import pl.edu.agh.flows._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
@@ -23,19 +23,20 @@ object AnyTypeInputTest extends App {
     res
   }
 
-  val sumOnlyNumbers = MultipleAction[Any, Any](numOfIns = 3) { ins =>
-    val res = (ins(0), ins(1), ins(2)) match {
+  val sumOnlyNumbers = NamedMultipleAction[Any, Any](numOfIns = 3) { ins =>
+    val res = (ins("firstIn"), ins("secondIn"), ins("thirdIn")) match {
       case (i1: Int, i2: Int, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Double, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Int, i3: Double) => i1 + i2 + i3
       case (i1: Int, i2: String, i3: Double) => i1 + i3
-      case _ => identity(ins(0), ins(1), ins(2))
+      case _ => identity(ins("firstIn"), ins("secondIn"), ins("thirdIn"))
     }
     res
   }
 
   val sumSyncProc = Sync (
     name = "sumProc",
+    ins = Seq("firstIn", "secondIn", "thirdIn"),
     outs = Seq("sumOut_1", "sumOut_2"),
     action = sumOnlyNumbers,
     sendTo = "sumOut_1"

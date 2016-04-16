@@ -23,7 +23,7 @@ object AnyTypeInputTest extends App {
     res
   }
 
-  val sumOnlyNumbers = NamedMultipleAction[Any, Any](numOfIns = 3) { ins =>
+  val sumOnlyNumbers = NamedMultipleAction[Any, Any] { ins =>
     val res = (ins("firstIn"), ins("secondIn"), ins("thirdIn")) match {
       case (i1: Int, i2: Int, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Double, i3: Int) => i1 + i2 + i3

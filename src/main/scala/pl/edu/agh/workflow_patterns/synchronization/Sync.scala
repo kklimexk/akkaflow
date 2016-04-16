@@ -2,7 +2,7 @@ package pl.edu.agh.workflow_patterns.synchronization
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import pl.edu.agh.actions.IMultipleAction
+import pl.edu.agh.actions.{IMultipleAction, INamedMultipleAction, IUnnamedMultipleAction}
 import pl.edu.agh.workflow_patterns.Pattern
 
 //Sync Pattern with multiple inputs
@@ -11,7 +11,14 @@ class Sync[T, R](name: String, numOfOuts: Int, ins: Seq[String], outs: Seq[Strin
   //Ewentualnie mozna uzyc LinkedBlockingQueue
   val syncPointsQueues = {
     var res = Seq.empty[ConcurrentLinkedQueue[T]]
-    for (i <- 0 until action.numOfIns) {
+    var numOfIns: Int = 0
+    action match {
+      case act: IUnnamedMultipleAction[T, R] =>
+        numOfIns = act.numOfIns
+      case _: INamedMultipleAction[T, R] =>
+        numOfIns = ins.size
+    }
+    for (i <- 0 until numOfIns) {
       res :+= new ConcurrentLinkedQueue[T]()
     }
     res

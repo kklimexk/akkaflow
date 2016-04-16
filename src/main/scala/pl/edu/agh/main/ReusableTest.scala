@@ -1,6 +1,5 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.Action
 import pl.edu.agh.flows.{Source, Out, In}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
@@ -14,21 +13,22 @@ import pl.edu.agh.dsl.WorkFlowDsl._
   * */
 object ReusableTest extends App {
 
-  val multiplyByTen = Action[Int, Int] { in =>
+  val multiplyByTen = { in: Int =>
     in * 10
   }
+  val act = identity(_: Int)
 
   val mergeProc = Merge[Int, Int] (
     name = "mergeProc",
     numOfOuts = 2,
-    action = { in: Int => in },
+    action = act,
     sendTo = "out1"
   )
 
   val splitProc = Split[Int, Int] (
     name = "splitProc",
     numOfOuts = 3,
-    action = { in: Int => in }
+    action = act
   )
 
   val w = Workflow (
@@ -50,7 +50,7 @@ object ReusableTest extends App {
       splitProc.outs(1) ~> mergeProc
       splitProc.outs(2) ~> mergeProc
 
-      splitProc changeActionOn Action(identity)
+      splitProc changeActionOn act
 
       mergeProc.outs(0) ~> splitProc
 

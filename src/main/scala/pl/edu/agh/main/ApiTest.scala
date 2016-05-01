@@ -15,7 +15,7 @@ object ApiTest extends App {
   }
 
   val multipleSyncAct = { (ins: Ins[Int], outs: Outs) =>
-    "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble =>> outs("out2")
+    "%.2f".format(ins(0).toDouble / ins("in1").toDouble).toDouble =>> outs("out2")
   }
 
   val mergeAct2 = { in: Double => implicit outs: Outs =>

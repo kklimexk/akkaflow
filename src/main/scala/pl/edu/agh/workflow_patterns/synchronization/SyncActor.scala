@@ -37,7 +37,7 @@ class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var m
           }
         } else {
           for (i <- 0 until syncPoints.size) {
-            sync = sync + (("out" + i) -> syncPoints(i).poll())
+            sync = sync + (("in" + i) -> syncPoints(i).poll())
           }
         }
         multipleAction.execute(Ins(sync))(Outs(_outs))

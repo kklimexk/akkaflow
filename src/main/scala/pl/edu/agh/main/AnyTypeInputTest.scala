@@ -3,7 +3,6 @@ package pl.edu.agh.main
 import pl.edu.agh.flows._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
-import pl.edu.agh.workflow_patterns.split.Split
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.workflow_patterns.synchronization.Sync
@@ -44,7 +43,7 @@ object AnyTypeInputTest extends App {
     action = sumOnlyNumbers
   )
 
-  val splitProc = Split[Any, Any] (
+  val splitProc = Merge[Any, Any] (
     name = "splitProc",
     numOfOuts = 3,
     action = splitAct

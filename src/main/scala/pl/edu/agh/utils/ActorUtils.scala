@@ -6,9 +6,7 @@ import akka.pattern.ask
 
 import pl.edu.agh.messages.Get
 import pl.edu.agh.workflow_patterns.PatternActor
-import pl.edu.agh.workflow_patterns.choice.{Choice, ChoiceActor}
 import pl.edu.agh.workflow_patterns.merge.{MergeActor, Merge}
-import pl.edu.agh.workflow_patterns.split.{Split, SplitActor}
 import pl.edu.agh.workflow_patterns.synchronization.{Sync, SyncActor}
 
 import scala.concurrent.Await
@@ -35,16 +33,8 @@ object ActorUtils {
         Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, R]]
       }
 
-      def toChoiceActor[T, R]: ChoiceActor[T, R] = {
-        Await.result(actorF, timeout.duration).asInstanceOf[ChoiceActor[T, R]]
-      }
-
       def toMergeActor[T, R]: MergeActor[T, R] = {
         Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T, R]]
-      }
-
-      def toSplitActor[T, R]: SplitActor[T, R] = {
-        Await.result(actorF, timeout.duration).asInstanceOf[SplitActor[T, R]]
       }
 
       /*def out: List[Int] = {
@@ -59,8 +49,6 @@ object ActorUtils {
 
     }
     implicit def convertSyncToSyncActor[T, R](mSync: Sync[T, R]): SyncActor[T, R] = mSync.actor.toSyncActor
-    implicit def convertChoiceToChoiceActor[T, R](choice: Choice[T, R]): ChoiceActor[T, R] = choice.actor.toChoiceActor
     implicit def convertMergeToMergeActor[T, R](merge: Merge[T, R]): MergeActor[T, R] = merge.actor.toMergeActor
-    implicit def convertSplitToSplitActor[T, R](split: Split[T, R]): SplitActor[T, R] = split.actor.toSplitActor
   }
 }

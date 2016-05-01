@@ -5,7 +5,6 @@ import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows._
 import pl.edu.agh.utils.Utils.crc32
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow_patterns.merge.Merge
@@ -22,7 +21,7 @@ object ChoiceMain extends App {
     in =>> outs("out1")
   }
 
-  val choiceProc = Choice[String, String] (
+  val choiceProc = Merge[String, String] (
     name = "choice",
     numOfOuts = 3,
     action = choiceAction

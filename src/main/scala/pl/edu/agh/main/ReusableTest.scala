@@ -4,7 +4,6 @@ import pl.edu.agh.actions.Outs
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
-import pl.edu.agh.workflow_patterns.split.Split
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.dsl.WorkFlowDsl._
@@ -33,7 +32,7 @@ object ReusableTest extends App {
     action = mergeAct
   )
 
-  val splitProc = Split[Int, Int] (
+  val splitProc = Merge[Int, Int] (
     name = "splitProc",
     numOfOuts = 3,
     action = act

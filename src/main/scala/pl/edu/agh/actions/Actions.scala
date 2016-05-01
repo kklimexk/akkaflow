@@ -20,9 +20,21 @@ case class Action[T, R](action: (T, Outs) => Unit) extends ISingleAction[T, R] {
   }
 }
 
+case class Action2[T, R](action: T => Outs => Unit) extends ISingleAction[T, R] {
+  def execute(in: T)(outs: Outs): Unit = {
+    action(in)(outs)
+  }
+}
+
 case class MultipleAction[T, R](action: (Ins[T], Outs) => Unit) extends IMultipleAction[T, R] {
   override def execute(ins: Ins[T])(outs: Outs): Unit = {
     action(ins, outs)
+  }
+}
+
+case class MultipleAction2[T, R](action: Ins[T] => Outs => Unit) extends IMultipleAction[T, R] {
+  override def execute(ins: Ins[T])(outs: Outs): Unit = {
+    action(ins)(outs)
   }
 }
 
@@ -33,6 +45,9 @@ object ActionDsl {
     }
     def =>>(out: (String, ActorRef)) = {
       out._2 ! ResultMessage(result)
+    }
+    def =>>(outName: String)(implicit outs: Outs) = {
+      outs(outName) ! ResultMessage(result)
     }
   }
 }

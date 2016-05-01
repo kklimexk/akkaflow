@@ -15,16 +15,16 @@ object AnyTypeInputTest extends App {
     outs().foreach(out => in =>> out)
   }
 
-  val sum = { (in: Seq[Any], outs: Outs) =>
+  val sum = { in: Seq[Any] => implicit outs: Outs =>
     val res = in match {
       case i: List[Double] => i.reduceLeft[Double](_+_)
       case i: List[Int] => i.reduceLeft[Int](_+_)
       case _ => identity(in)
     }
-    res =>> outs("secondOut")
+    res =>> "secondOut"
   }
 
-  val sumOnlyNumbers = { (ins: Ins[Any], outs: Outs) =>
+  val sumOnlyNumbers = { ins: Ins[Any] => implicit outs: Outs =>
     val res = (ins("firstIn"), ins("secondIn"), ins("thirdIn")) match {
       case (i1: Int, i2: Int, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Double, i3: Int) => i1 + i2 + i3
@@ -32,7 +32,7 @@ object AnyTypeInputTest extends App {
       case (i1: Int, i2: String, i3: Double) => i1 + i3
       case _ => identity(ins("firstIn"), ins("secondIn"), ins("thirdIn"))
     }
-    res =>> outs("sumOut_1")
+    res =>> "sumOut_1"
   }
 
   val sumSyncProc = Sync[Any, Any] (

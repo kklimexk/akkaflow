@@ -31,4 +31,8 @@ object Sync {
   def apply[T, R](name: String, numOfIns: Int, outs: Seq[String], action: (Ins[T], Outs) => Unit)(implicit d: DummyImplicit) = new Sync[T, R](name, numOfIns, 0, Seq.empty, outs, ActionConverter[T, R](action))
   def apply[T, R](name: String, ins: Seq[String], numOfOuts: Int, action: (Ins[T], Outs) => Unit) = new Sync[T, R](name, 0, numOfOuts, ins, Seq.empty, ActionConverter[T, R](action))
   def apply[T, R](name: String, ins: Seq[String], outs: Seq[String], action: (Ins[T], Outs) => Unit) = new Sync[T, R](name, 0, 0, ins, outs, ActionConverter[T, R](action))
+  def apply[T, R](name: String, numOfIns: Int, numOfOuts: Int, action: Ins[T] => Outs => Unit) = new Sync[T, R](name, numOfIns, numOfOuts, Seq.empty, Seq.empty, ActionConverter[T, R](action))
+  def apply[T, R](name: String, numOfIns: Int, outs: Seq[String], action: Ins[T] => Outs => Unit)(implicit d: DummyImplicit) = new Sync[T, R](name, numOfIns, 0, Seq.empty, outs, ActionConverter[T, R](action))
+  def apply[T, R](name: String, ins: Seq[String], numOfOuts: Int, action: Ins[T] => Outs => Unit) = new Sync[T, R](name, 0, numOfOuts, ins, Seq.empty, ActionConverter[T, R](action))
+  def apply[T, R](name: String, ins: Seq[String], outs: Seq[String], action: Ins[T] => Outs => Unit) = new Sync[T, R](name, 0, 0, ins, outs, ActionConverter[T, R](action))
 }

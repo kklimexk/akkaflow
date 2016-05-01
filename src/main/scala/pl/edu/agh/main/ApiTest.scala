@@ -18,8 +18,8 @@ object ApiTest extends App {
     "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble =>> outs("out2")
   }
 
-  val mergeAct2 = { (in: Double, outs: Outs) =>
-    in.toString =>> outs("out1")
+  val mergeAct2 = { in: Double => implicit outs: Outs =>
+    in.toString =>> "out1"
   }
 
   val splitAct = { (in: String, outs: Outs) =>

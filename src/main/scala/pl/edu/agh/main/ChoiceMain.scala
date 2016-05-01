@@ -1,30 +1,37 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.Action
+import pl.edu.agh.actions.Outs
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows._
 import pl.edu.agh.utils.Utils.crc32
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.utils.ActorUtils.Implicits._
+import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow_patterns.merge.Merge
 
 object ChoiceMain extends App {
 
-  val action = { in: String => in }
+  val choiceAction = { (in: String, outs: Outs) =>
+    val result = crc32(in)
+    val i = result % outs().size
+    in =>> outs(i)
+  }
+
+  val mergeAction = { (in: String, outs: Outs) =>
+    in =>> outs("out1")
+  }
 
   val choiceProc = Choice[String, String] (
     name = "choice",
     numOfOuts = 3,
-    action = action,
-    (d: String) => crc32(d)
+    action = choiceAction
   )
 
   val mergeProc = Merge[String, String] (
     name = "merge",
     numOfOuts = 2,
-    action = action,
-    sendTo = "out1"
+    action = mergeAction
   )
 
   val w = Workflow (

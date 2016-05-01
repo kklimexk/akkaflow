@@ -1,33 +1,33 @@
 package pl.edu.agh.main
 
+import pl.edu.agh.actions.Outs
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows.{Out, In, Source}
+import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
+import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
 
 object FirstTest extends App {
 
-  val sqr = { in: Int =>
-    in * in
+  val sqr = { (in: Int, outs: Outs) =>
+    in * in =>> outs("o1")
   }
 
-  val sum = { in: List[Int] =>
-    in.reduceLeft[Int](_+_)
+  val sum = { (in: List[Int], outs: Outs) =>
+    in.reduceLeft[Int](_+_) =>> outs("out0")
   }
 
-  val sqrProc = Merge (
+  val sqrProc = Merge[Int, Int] (
     name = "sqrProc",
     outs = Seq("o1", "output2"),
-    action = sqr,
-    sendTo = "o1"
+    action = sqr
   )
 
-  val sumProc = Merge (
+  val sumProc = Merge[List[Int], Int] (
     name = "sumProc",
     numOfOuts = 2,
-    action = sum,
-    sendTo = "out0"
+    action = sum
   )
 
   val w = Workflow (

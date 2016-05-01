@@ -1,44 +1,45 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.Action
+import pl.edu.agh.actions.{Action, Outs}
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows.{Out, In, Source}
+import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
+import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
 
 object MergeMain extends App {
 
-  val action = { in: Int =>
-    in
+  val firstAct = { (in: Int, outs: Outs) =>
+    in =>> outs("out0")
   }
 
-  val firstProc = Merge (
+  val secondAct = { (in: Int, outs: Outs) =>
+    in =>> outs("out1")
+  }
+
+  val firstProc = Merge[Int, Int] (
     name = "sumProc",
     numOfOuts = 2,
-    action = action,
-    sendTo = "out0"
+    action = firstAct
   )
 
-  val secondProc = Merge (
+  val secondProc = Merge[Int, Int] (
     name = "sqrProc",
     numOfOuts = 2,
-    action = action,
-    sendTo = "out0"
+    action = firstAct
   )
 
-  val thirdProc = Merge (
+  val thirdProc = Merge[Int, Int] (
     name = "thirdProc",
     numOfOuts = 2,
-    action = action,
-    sendTo = "out1"
+    action = secondAct
   )
 
-  val mergeProc = Merge (
+  val mergeProc = Merge[Int, Int] (
     name = "mergeProc",
     numOfOuts = 1,
-    action = action,
-    sendTo = "out0"
+    action = firstAct
   )
 
   val w = Workflow (

@@ -1,9 +1,11 @@
 package pl.edu.agh.main
 
+import pl.edu.agh.actions.Outs
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.utils.ActorUtils.Implicits._
+import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow_patterns.choice.Choice
 import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.split.Split
@@ -11,51 +13,56 @@ import pl.edu.agh.workflow_patterns.synchronization.Sync
 
 object ApiTest extends App {
 
-  val mergeAct = { in: Int =>
-    in * in
+  val mergeAct = { (in: Int, outs: Outs) =>
+    (in * in) =>> outs("out1")
   }
 
-  val multipleSyncAct = { ins: Seq[Int] =>
-    "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble
+  val multipleSyncAct = { (ins: Seq[Int], outs: Outs) =>
+    "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble =>> outs("out2")
   }
 
-  val mergeAct2 = { in: Double =>
-    in.toString
+  val mergeAct2 = { (in: Double, outs: Outs) =>
+    in.toString =>> outs("out1")
+  }
+
+  val splitAct = { (in: String, outs: Outs) =>
+    outs().foreach(out => in =>> out._2)
   }
 
   val mergeProc = Merge[Int, Int] (
     name = "mergeProc",
     numOfOuts = 2,
-    action = mergeAct,
-    sendTo = "out1"
+    action = mergeAct
   )
+
+  val choiceAction = { (in: Int, outs: Outs) =>
+    val i = in % outs().size
+    in =>> outs(i)
+  }
 
   val choiceProc = Choice[Int, Int] (
     name = "choiceProc",
     numOfOuts = 2,
-    action = identity(_: Int),
-    (d: Int) => d
+    action = choiceAction
   )
 
   val multipleSyncProc = Sync[Int, Double] (
     name = "multipleSyncProc",
     numOfIns = 2,
     numOfOuts = 3,
-    action = multipleSyncAct,
-    sendTo = "out2"
+    action = multipleSyncAct
   )
 
   val mergeProc2 = Merge[Double, String] (
     name = "mergeProc2",
     numOfOuts = 3,
-    action = mergeAct2,
-    sendTo = "out1"
+    action = mergeAct2
   )
 
   val splitProc = Split[String, String] (
     name = "splitProc",
     outs = Seq("wyj1", "wyj2", "wyj3"),
-    action = { in: String => in }
+    action = splitAct
   )
 
   val w = Workflow (

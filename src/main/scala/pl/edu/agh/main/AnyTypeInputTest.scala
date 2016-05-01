@@ -7,22 +7,26 @@ import pl.edu.agh.workflow_patterns.split.Split
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.workflow_patterns.synchronization.Sync
+import pl.edu.agh.actions.ActionDsl._
+import pl.edu.agh.actions.Outs
 
 /** Prosty test majacy sprawdzic czy mozna uzyc roznych typow danych dla wejsc */
 object AnyTypeInputTest extends App {
 
-  val act = identity(_: Any)
+  val splitAct = { (in: Any, outs: Outs) =>
+    outs().foreach(out => in =>> out._2)
+  }
 
-  val sum = { in: List[Any] =>
+  val sum = { (in: Seq[Any], outs: Outs) =>
     val res = in match {
       case i: List[Double] => i.reduceLeft[Double](_+_)
       case i: List[Int] => i.reduceLeft[Int](_+_)
       case _ => identity(in)
     }
-    res
+    res =>> outs("secondOut")
   }
 
-  val sumOnlyNumbers = { ins: Map[String, Any] =>
+  val sumOnlyNumbers = { (ins: Map[String, Any], outs: Outs) =>
     val res = (ins("firstIn"), ins("secondIn"), ins("thirdIn")) match {
       case (i1: Int, i2: Int, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Double, i3: Int) => i1 + i2 + i3
@@ -30,28 +34,26 @@ object AnyTypeInputTest extends App {
       case (i1: Int, i2: String, i3: Double) => i1 + i3
       case _ => identity(ins("firstIn"), ins("secondIn"), ins("thirdIn"))
     }
-    res
+    res =>> outs("sumOut_1")
   }
 
-  val sumSyncProc = Sync (
+  val sumSyncProc = Sync[Any, Any] (
     name = "sumProc",
     ins = Seq("firstIn", "secondIn", "thirdIn"),
     outs = Seq("sumOut_1", "sumOut_2"),
-    action = sumOnlyNumbers,
-    sendTo = "sumOut_1"
+    action = sumOnlyNumbers
   )
 
-  val splitProc = Split (
+  val splitProc = Split[Any, Any] (
     name = "splitProc",
     numOfOuts = 3,
-    action = act
+    action = splitAct
   )
 
-  val mergeProc = Merge (
+  val mergeProc = Merge[Seq[Any], Any] (
     name = "mergeProc",
     outs = Seq("firstOut", "secondOut"),
-    action = sum,
-    sendTo = "secondOut"
+    action = sum
   )
 
   val w = Workflow (

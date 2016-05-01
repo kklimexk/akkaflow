@@ -1,35 +1,35 @@
 package pl.edu.agh.main
 
+import pl.edu.agh.actions.Outs
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
+import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.workflow_patterns.synchronization._
 
 object SyncMain extends App {
 
-  val sum = { ins: Seq[Int] =>
-    ins(0) + ins(1)
+  val sum = { (ins: Seq[Int], outs: Outs) =>
+    ins(0) + ins(1) =>> outs("out0")
   }
 
-  val mul = { in: List[Int] =>
-    in.reduceLeft[Int](_*_)
+  val mul = { (in: List[Int], outs: Outs) =>
+    in.reduceLeft[Int](_*_) =>> outs("out0")
   }
 
-  val sumProc = Sync (
+  val sumProc = Sync[Int, Int] (
     name = "sumProc",
     numOfIns = 2,
     numOfOuts = 2,
-    action = sum,
-    sendTo = "out0"
+    action = sum
   )
 
   val mulProc = Merge (
     name = "mulProc",
     numOfOuts = 1,
-    action = mul,
-    sendTo = "out0"
+    action = mul
   )
 
   val w = Workflow (

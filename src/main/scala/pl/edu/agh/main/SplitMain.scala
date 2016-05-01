@@ -1,19 +1,20 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.Action
-import pl.edu.agh.flows.{Source, Out, In}
+import pl.edu.agh.actions.{Action, Outs}
+import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow_patterns.split.Split
 import pl.edu.agh.utils.ActorUtils.Implicits._
+import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.dsl.WorkFlowDsl._
 
 object SplitMain extends App {
 
-  val sqr = { in: Int =>
-    in * in
+  val sqr = { (in: Int, outs: Outs) =>
+    outs().foreach(out => in * in =>> out._2)
   }
 
-  val splitProc = Split (
+  val splitProc = Split[Int, Int] (
     name = "splitProc",
     numOfOuts = 3,
     action = sqr

@@ -2,12 +2,11 @@ package pl.edu.agh.main
 
 import pl.edu.agh.flows._
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns.merge.Merge
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.workflow_patterns.synchronization.Sync
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.actions.Outs
+import pl.edu.agh.workflow_patterns._
 
 /** Prosty test majacy sprawdzic czy mozna uzyc roznych typow danych dla wejsc */
 object AnyTypeInputTest extends App {
@@ -43,7 +42,7 @@ object AnyTypeInputTest extends App {
     action = sumOnlyNumbers
   )
 
-  val splitProc = Merge[Any, Any] (
+  val splitProc = Split[Any, Any] (
     name = "splitProc",
     numOfOuts = 3,
     action = splitAct

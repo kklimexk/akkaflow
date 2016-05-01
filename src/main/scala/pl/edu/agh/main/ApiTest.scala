@@ -6,8 +6,7 @@ import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
-import pl.edu.agh.workflow_patterns.merge.Merge
-import pl.edu.agh.workflow_patterns.synchronization.Sync
+import pl.edu.agh.workflow_patterns._
 
 object ApiTest extends App {
 
@@ -38,7 +37,7 @@ object ApiTest extends App {
     in =>> outs(i)
   }
 
-  val choiceProc = Merge[Int, Int] (
+  val choiceProc = Choice[Int, Int] (
     name = "choiceProc",
     numOfOuts = 2,
     action = choiceAction
@@ -57,7 +56,7 @@ object ApiTest extends App {
     action = mergeAct2
   )
 
-  val splitProc = Merge[String, String] (
+  val splitProc = Split[String, String] (
     name = "splitProc",
     outs = Seq("wyj1", "wyj2", "wyj3"),
     action = splitAct

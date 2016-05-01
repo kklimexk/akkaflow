@@ -1,6 +1,6 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.Outs
+import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.dsl.WorkFlowDsl._
@@ -14,7 +14,7 @@ object ApiTest extends App {
     (in * in) =>> outs("out1")
   }
 
-  val multipleSyncAct = { (ins: Seq[Int], outs: Outs) =>
+  val multipleSyncAct = { (ins: Ins[Int], outs: Outs) =>
     "%.2f".format(ins(0).toDouble / ins(1).toDouble).toDouble =>> outs("out2")
   }
 

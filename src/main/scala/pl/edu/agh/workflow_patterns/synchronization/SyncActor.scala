@@ -6,7 +6,7 @@ import pl.edu.agh.workflow_patterns.{PatternActor, PatternOuts}
 
 import scala.util.control.Breaks._
 import akka.actor.{ActorLogging, Props}
-import pl.edu.agh.actions.{IMultipleAction, INamedMultipleAction, IUnnamedMultipleAction, Outs}
+import pl.edu.agh.actions.{IMultipleAction, Ins, Outs}
 import pl.edu.agh.messages._
 
 class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var multipleAction: IMultipleAction[T, R], syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends PatternActor(numOfOuts, outs, multipleAction) with PatternOuts[R] with ActorLogging {
@@ -30,22 +30,17 @@ class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var m
       }
 
       if (canExecuteAction) {
-        multipleAction match {
-          case _: IUnnamedMultipleAction[T, R] =>
-            var sync = Seq.empty[T]
-
-            syncPoints.foreach { q =>
-              sync :+= q.poll()
-            }
-            multipleAction.execute(sync: _*)(Outs(_outs))
-          case _: INamedMultipleAction[T, R] =>
-            var sync = Map.empty[String, T]
-
-            for (i <- 0 until syncPoints.size) {
-              sync = sync + (ins(i) -> syncPoints(i).poll())
-            }
-            multipleAction.execute(sync)(Outs(_outs))
+        var sync = Map.empty[String, T]
+        if (ins.nonEmpty) {
+          for (i <- 0 until syncPoints.size) {
+            sync = sync + (ins(i) -> syncPoints(i).poll())
+          }
+        } else {
+          for (i <- 0 until syncPoints.size) {
+            sync = sync + (("out" + i) -> syncPoints(i).poll())
+          }
         }
+        multipleAction.execute(Ins(sync))(Outs(_outs))
       }
     case ChangeAction(act: IMultipleAction[T, R]) =>
       multipleAction = act

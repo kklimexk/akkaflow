@@ -12,11 +12,10 @@ class Sync[T, R](name: String, numOfIns: Int, numOfOuts: Int, ins: Seq[String], 
   val syncPointsQueues = {
     var res = Seq.empty[ConcurrentLinkedQueue[T]]
     var insCount: Int = 0
-    action match {
-      case _: IUnnamedMultipleAction[T, R] =>
-        insCount = numOfIns
-      case _: INamedMultipleAction[T, R] =>
-        insCount = ins.size
+    if (numOfIns > 0) {
+      insCount = numOfIns
+    } else if (ins.nonEmpty) {
+      insCount = ins.size
     }
     for (i <- 0 until insCount) {
       res :+= new ConcurrentLinkedQueue[T]()
@@ -28,8 +27,8 @@ class Sync[T, R](name: String, numOfIns: Int, numOfOuts: Int, ins: Seq[String], 
 }
 
 object Sync {
-  def apply[T, R](name: String, numOfIns: Int, numOfOuts: Int, action: (Seq[T], Outs) => Unit) = new Sync[T, R](name, numOfIns, numOfOuts, Seq.empty, Seq.empty, ActionConverter[T, R](action))
-  def apply[T, R](name: String, numOfIns: Int, outs: Seq[String], action: (Seq[T], Outs) => Unit)(implicit d: DummyImplicit) = new Sync[T, R](name, numOfIns, 0, Seq.empty, outs, ActionConverter[T, R](action))
-  def apply[T, R](name: String, numOfOuts: Int, ins: Seq[String], action: (Map[String, T], Outs) => Unit) = new Sync[T, R](name, 0, numOfOuts, ins, Seq.empty, ActionConverter[T, R](action))
-  def apply[T, R](name: String, ins: Seq[String], outs: Seq[String], action: (Map[String, T], Outs) => Unit) = new Sync[T, R](name, 0, 0, ins, outs, ActionConverter[T, R](action))
+  def apply[T, R](name: String, numOfIns: Int, numOfOuts: Int, action: (Ins[T], Outs) => Unit) = new Sync[T, R](name, numOfIns, numOfOuts, Seq.empty, Seq.empty, ActionConverter[T, R](action))
+  def apply[T, R](name: String, numOfIns: Int, outs: Seq[String], action: (Ins[T], Outs) => Unit)(implicit d: DummyImplicit) = new Sync[T, R](name, numOfIns, 0, Seq.empty, outs, ActionConverter[T, R](action))
+  def apply[T, R](name: String, ins: Seq[String], numOfOuts: Int, action: (Ins[T], Outs) => Unit) = new Sync[T, R](name, 0, numOfOuts, ins, Seq.empty, ActionConverter[T, R](action))
+  def apply[T, R](name: String, ins: Seq[String], outs: Seq[String], action: (Ins[T], Outs) => Unit) = new Sync[T, R](name, 0, 0, ins, outs, ActionConverter[T, R](action))
 }

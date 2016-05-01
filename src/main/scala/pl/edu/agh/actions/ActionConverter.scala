@@ -5,6 +5,5 @@ package pl.edu.agh.actions
   */
 object ActionConverter {
   def apply[T, R](action: (T, Outs) => Unit): ISingleAction[T, R] = Action[T, R](action)
-  def apply[T, R](action: (Seq[T], Outs) => Unit): IUnnamedMultipleAction[T, R] = MultipleAction[T, R](action)
-  def apply[T, R](action: (Map[String, T], Outs) => Unit): INamedMultipleAction[T, R] = NamedMultipleAction[T, R](action)
+  def apply[T, R](action: (Ins[T], Outs) => Unit): IMultipleAction[T, R] = MultipleAction[T, R](action)
 }

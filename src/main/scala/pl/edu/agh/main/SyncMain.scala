@@ -1,17 +1,16 @@
 package pl.edu.agh.main
 
-import pl.edu.agh.actions.Outs
+import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns.merge.Merge
-import pl.edu.agh.workflow_patterns.synchronization._
+import pl.edu.agh.workflow_patterns._
 
 object SyncMain extends App {
 
-  val sum = { (ins: Seq[Int], outs: Outs) =>
+  val sum = { (ins: Ins[Int], outs: Outs) =>
     ins(0) + ins(1) =>> outs("out0")
   }
 

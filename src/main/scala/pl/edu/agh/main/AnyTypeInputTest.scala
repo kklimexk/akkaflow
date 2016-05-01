@@ -5,7 +5,7 @@ import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.actions.ActionDsl._
-import pl.edu.agh.actions.Outs
+import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.workflow_patterns._
 
 /** Prosty test majacy sprawdzic czy mozna uzyc roznych typow danych dla wejsc */
@@ -24,7 +24,7 @@ object AnyTypeInputTest extends App {
     res =>> outs("secondOut")
   }
 
-  val sumOnlyNumbers = { (ins: Map[String, Any], outs: Outs) =>
+  val sumOnlyNumbers = { (ins: Ins[Any], outs: Outs) =>
     val res = (ins("firstIn"), ins("secondIn"), ins("thirdIn")) match {
       case (i1: Int, i2: Int, i3: Int) => i1 + i2 + i3
       case (i1: Int, i2: Double, i3: Int) => i1 + i2 + i3

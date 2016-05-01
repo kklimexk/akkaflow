@@ -16,7 +16,7 @@ import pl.edu.agh.dsl.WorkFlowDsl._
 object ReusableTest extends App {
 
   val multiplyByTen = { (in: Int, outs: Outs) =>
-    outs().foreach(out => in * 10 =>> out._2)
+    outs().foreach(out => in * 10 =>> out)
   }
 
   val mergeAct = { (in: Int, outs: Outs) =>
@@ -24,7 +24,7 @@ object ReusableTest extends App {
   }
 
   val act = { (in: Int, outs: Outs) =>
-    outs().foreach(out => in =>> out._2)
+    outs().foreach(out => in =>> out)
   }
 
   val mergeProc = Merge[Int, Int] (

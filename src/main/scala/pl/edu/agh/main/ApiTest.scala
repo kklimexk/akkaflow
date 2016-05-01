@@ -26,7 +26,7 @@ object ApiTest extends App {
   }
 
   val splitAct = { (in: String, outs: Outs) =>
-    outs().foreach(out => in =>> out._2)
+    outs().foreach(out => in =>> out)
   }
 
   val mergeProc = Merge[Int, Int] (

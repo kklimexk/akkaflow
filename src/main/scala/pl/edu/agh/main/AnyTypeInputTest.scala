@@ -14,7 +14,7 @@ import pl.edu.agh.actions.Outs
 object AnyTypeInputTest extends App {
 
   val splitAct = { (in: Any, outs: Outs) =>
-    outs().foreach(out => in =>> out._2)
+    outs().foreach(out => in =>> out)
   }
 
   val sum = { (in: Seq[Any], outs: Outs) =>

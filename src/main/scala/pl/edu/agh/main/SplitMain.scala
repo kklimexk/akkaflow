@@ -11,7 +11,7 @@ import pl.edu.agh.dsl.WorkFlowDsl._
 object SplitMain extends App {
 
   val sqr = { (in: Int, outs: Outs) =>
-    outs().foreach(out => in * in =>> out._2)
+    outs().foreach(out => in * in =>> out)
   }
 
   val splitProc = Split[Int, Int] (

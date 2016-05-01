@@ -44,5 +44,8 @@ object ActionDsl {
     def =>>(out: ActorRef) = {
       out ! ResultMessage(result)
     }
+    def =>>(out: (String, ActorRef)) = {
+      out._2 ! ResultMessage(result)
+    }
   }
 }

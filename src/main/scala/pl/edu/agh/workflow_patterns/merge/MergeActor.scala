@@ -8,12 +8,7 @@ import pl.edu.agh.workflow_patterns.{PatternActor, PatternOuts}
 class MergeActor[T, R](numOfOuts: Int, outs: Seq[String], var action: ISingleAction[T, R]) extends PatternActor(numOfOuts, outs, action) with PatternOuts[R] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
-      if (numOfOuts > 0) {
         action.execute(data)(Outs(_outs))
-      }
-      if (outs.nonEmpty) {
-        action.execute(data)(Outs(userDefinedOuts))
-      }
     case ChangeAction(act: ISingleAction[T, R]) =>
       action = act
     /*case ChangeSendTo(outName) =>

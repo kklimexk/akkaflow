@@ -44,7 +44,7 @@ class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var m
             for (i <- 0 until syncPoints.size) {
               sync = sync + (ins(i) -> syncPoints(i).poll())
             }
-            multipleAction.execute(sync)(Outs(userDefinedOuts))
+            multipleAction.execute(sync)(Outs(_outs))
         }
       }
     case ChangeAction(act: IMultipleAction[T, R]) =>

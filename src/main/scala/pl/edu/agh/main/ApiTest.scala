@@ -10,56 +10,42 @@ import pl.edu.agh.workflow_patterns._
 
 object ApiTest extends App {
 
-  val mergeAct = { (in: Int, outs: Outs) =>
-    (in * in) =>> outs("out1")
-  }
-
-  val multipleSyncAct = { (ins: Ins[Int], outs: Outs) =>
-    "%.2f".format(ins(0).toDouble / ins("in1").toDouble).toDouble =>> outs("out2")
-  }
-
-  val mergeAct2 = { in: Double => implicit outs: Outs =>
-    in.toString =>> "out1"
-  }
-
-  val splitAct = { (in: String, outs: Outs) =>
-    outs().foreach(out => in =>> out)
-  }
-
   val mergeProc = Merge[Int, Int] (
     name = "mergeProc",
     numOfOuts = 2,
-    action = mergeAct
+    action = (in: Int, outs: Outs) => (in * in) =>> outs("out1")
   )
-
-  val choiceAction = { (in: Int, outs: Outs) =>
-    val i = in % outs().size
-    in =>> outs(i)
-  }
 
   val choiceProc = Choice[Int, Int] (
     name = "choiceProc",
     numOfOuts = 2,
-    action = choiceAction
+    action = { (in: Int, outs: Outs) =>
+      val i = in % outs().size
+      in =>> outs(i)
+    }
   )
 
   val multipleSyncProc = Sync[Int, Double] (
     name = "multipleSyncProc",
     numOfIns = 2,
     numOfOuts = 3,
-    action = multipleSyncAct
+    action = { (ins: Ins[Int], outs: Outs) =>
+      ins("in1").toDouble =>> outs("out0")
+      ins("in0").toDouble =>> outs("out1")
+      "%.2f".format(ins(0).toDouble / ins("in1").toDouble).toDouble =>> outs("out2")
+    }
   )
 
   val mergeProc2 = Merge[Double, String] (
     name = "mergeProc2",
     numOfOuts = 3,
-    action = mergeAct2
+    action = { in: Double => implicit outs: Outs => in.toString =>> "out1" }
   )
 
   val splitProc = Split[String, String] (
     name = "splitProc",
     outs = Seq("wyj1", "wyj2", "wyj3"),
-    action = splitAct
+    action = (in: String, outs: Outs) => outs().foreach(out => in =>> out)
   )
 
   val w = Workflow (
@@ -76,6 +62,8 @@ object ApiTest extends App {
       choiceProc.outs(0) ~> multipleSyncProc
       choiceProc.outs(1) ~> multipleSyncProc
 
+      multipleSyncProc.outs(0) ~> mergeProc2
+      multipleSyncProc.outs("out1") ~> mergeProc2
       multipleSyncProc.outs(2) ~> mergeProc2
 
       mergeProc2.outs(1) ~> splitProc
@@ -86,9 +74,9 @@ object ApiTest extends App {
     }
   )
 
-  Source(1 to 4) ~> w.ins(0)
-  Source(5 to 8) ~> w.ins(1)
-  Source(9 to 12) ~> w.ins(2)
+  Source(1 to 3) ~> w.ins(0)
+  Source(5 to 7) ~> w.ins(1)
+  Source(9 to 11) ~> w.ins(2)
 
   val res = w.run
   println(res)

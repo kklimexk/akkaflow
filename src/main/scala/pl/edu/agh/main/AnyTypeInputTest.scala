@@ -11,10 +11,6 @@ import pl.edu.agh.workflow_patterns._
 /** Prosty test majacy sprawdzic czy mozna uzyc roznych typow danych dla wejsc */
 object AnyTypeInputTest extends App {
 
-  val splitAct = { (in: Any, outs: Outs) =>
-    outs().foreach(out => in =>> out)
-  }
-
   val sum = { in: Seq[Any] => implicit outs: Outs =>
     val res = in match {
       case i: List[Double] => i.reduceLeft[Double](_+_)
@@ -32,7 +28,12 @@ object AnyTypeInputTest extends App {
       case (i1: Int, i2: String, i3: Double) => i1 + i3
       case _ => identity(ins("firstIn"), ins("secondIn"), ins("thirdIn"))
     }
+    def foo(d: Any) = d.asInstanceOf[Int].toDouble
+
+    val res2 = foo(ins("firstIn"))
+
     res =>> "sumOut_1"
+    res2 =>> "sumOut_2"
   }
 
   val sumSyncProc = Sync[Any, Any] (
@@ -42,16 +43,16 @@ object AnyTypeInputTest extends App {
     action = sumOnlyNumbers
   )
 
-  val splitProc = Split[Any, Any] (
-    name = "splitProc",
-    numOfOuts = 3,
-    action = splitAct
-  )
-
   val mergeProc = Merge[Seq[Any], Any] (
     name = "mergeProc",
     outs = Seq("firstOut", "secondOut"),
     action = sum
+  )
+
+  val splitProc = Split[Any, Any] (
+    name = "splitProc",
+    numOfOuts = 3,
+    action = (in: Any, outs: Outs) => outs().foreach(out => in =>> out)
   )
 
   val w = Workflow (
@@ -64,6 +65,7 @@ object AnyTypeInputTest extends App {
       ins(2) ~>> sumSyncProc
 
       sumSyncProc.outs("sumOut_1").grouped(10) ~> mergeProc
+      sumSyncProc.outs("sumOut_2").grouped(10) ~> mergeProc
 
       mergeProc.outs("secondOut") ~> splitProc
 

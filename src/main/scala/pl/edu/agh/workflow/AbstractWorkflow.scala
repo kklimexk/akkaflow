@@ -20,5 +20,8 @@ abstract class AbstractWorkflow[T, R](name: String, numOfIns: Int, numOfOuts: In
     outsSeq
   }
 
-  override def toString = s"Workflow { \n\tname = $name, \n\tins = $ins, \n\touts = $outs \n}"
+  def clearIns() = ins.foreach(in => in.data = List.empty[T])
+  def clearOuts() = outs.foreach(out => out.result = List.empty[R])
+
+  override def toString = s"Workflow { \n\tname = $name, \n\tins(latest) = $ins, \n\touts = $outs \n}"
 }

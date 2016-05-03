@@ -32,10 +32,13 @@ object WorkFlowDsl {
     }
     def =>>(in: In[Int])(implicit w: IWorkflow) = {
       val workflow = w.asInstanceOf[Workflow[Any, Any]]
-      in.data = List.empty[Int]
+      workflow.clearIns()
+
+      //in.data = List.empty[Int]
       source.data.foreach { d =>
         in.data :+= d
       }
+
       val resF = workflow.block(workflow.ins, workflow.outs)
       Await.ready(resF, Duration.Inf)
     }
@@ -52,10 +55,13 @@ object WorkFlowDsl {
     }
     def =>>(in: In[String])(implicit w: IWorkflow) = {
       val workflow = w.asInstanceOf[Workflow[Any, Any]]
-      in.data = List.empty[String]
+      workflow.clearIns()
+
+      //in.data = List.empty[String]
       source.data.foreach { d =>
         in.data :+= d
       }
+
       val resF = workflow.block(workflow.ins, workflow.outs)
       Await.ready(resF, Duration.Inf)
     }
@@ -72,10 +78,13 @@ object WorkFlowDsl {
     }
     def =>>(in: In[Any])(implicit w: IWorkflow) = {
       val workflow = w.asInstanceOf[Workflow[Any, Any]]
-      in.data = List.empty[Any]
+      workflow.clearIns()
+
+      //in.data = List.empty[Any]
       source.data.foreach { d =>
         in.data :+= d
       }
+
       val resF = workflow.block(workflow.ins, workflow.outs)
       Await.ready(resF, Duration.Inf)
     }
@@ -92,10 +101,13 @@ object WorkFlowDsl {
     }
     def =>>(in: In[Any])(implicit w: IWorkflow) = {
       val workflow = w.asInstanceOf[Workflow[Any, Any]]
-      in.data = List.empty[Any]
+      workflow.clearIns()
+
+      //in.data = List.empty[Any]
       source.data.foreach { d =>
         in.data :+= d
       }
+
       val resF = workflow.block(workflow.ins, workflow.outs)
       Await.ready(resF, Duration.Inf)
     }

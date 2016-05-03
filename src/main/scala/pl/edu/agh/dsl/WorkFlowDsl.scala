@@ -115,6 +115,7 @@ object WorkFlowDsl {
 
   object MSyncId {
     var uniqueId = new AtomicInteger(0)
+    def resetUniqueId = uniqueId = new AtomicInteger(0)
   }
 
   implicit class InputDataToNext[T](in: In[T]) {
@@ -173,6 +174,7 @@ object WorkFlowDsl {
         out
       })
 
+      MSyncId.resetUniqueId
       DataState.outs :+= outF
       Future.sequence(DataState.outs).mapTo[List[Out[R]]]
     }
@@ -191,33 +193,5 @@ object WorkFlowDsl {
       DataState.dataList :+= dataF
     }
   }
-
-  @deprecated("Now patterns contain Sink actors")
-  implicit class ResultToNext[R](data: List[R]) {
-    def ~>[T](elem: Pattern[T, R]) = {
-      PropagateDataActor(data) ! PropagateData(elem)
-    }
-
-    def ~>>(out: Out[R]) = {
-      var outRes = out.result
-      data.foreach { d =>
-        outRes :+= d
-      }
-      out.result = outRes
-      out
-    }
-  }
-
-  /*implicit object Send {
-    def ->[T](action: ISingleAction[T]) = {
-      action
-    }
-    def ->[T](action: IMultipleAction[T]) = {
-      action
-    }
-  }
-
-  def send[T](action: ISingleAction[T]) = action
-  def send[T](action: IMultipleAction[T]) = action*/
 
 }

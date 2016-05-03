@@ -6,7 +6,7 @@ import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns.merge.Merge
+import pl.edu.agh.workflow_patterns._
 
 object FirstTest extends App {
 
@@ -30,18 +30,24 @@ object FirstTest extends App {
     action = sum
   )
 
-  val w = Workflow (
+  implicit val w = Workflow (
     "Sum of Squares workflow",
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       ins(0) ~>> sqrProc
-      sqrProc.outs("o1").grouped(3) ~> sumProc
+      sqrProc.outs("o1").grouped(2) ~> sumProc
       sumProc.outs(0) ~>> outs(0)
     }
   )
 
-  Source(1 to 6) ~> w.ins(0)
-  val res = w.run
-  println(res)
-  println(w)
+  Source(1 to 4) ~> w.ins(0)
+  Source(1 to 4) ~> w.ins(0)
 
+  w.start
+
+  Source(1 to 4) =>> w.ins(0)
+  Source(1 to 4) =>> w.ins(0)
+
+  //w.stop
+
+  println(w.outs)
 }

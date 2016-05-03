@@ -3,10 +3,11 @@ package pl.edu.agh.dsl
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.ActorRef
-import pl.edu.agh.data_propagators.{PropagateDataForSyncActor, PropagateDataActor}
+import pl.edu.agh.data_propagators.{PropagateDataActor, PropagateDataForSyncActor}
 import pl.edu.agh.flows._
 import pl.edu.agh.messages._
 import pl.edu.agh.utils.SinkUtils
+import pl.edu.agh.workflow.{IWorkflow, Workflow}
 import pl.edu.agh.workflow_patterns.{IPattern, Pattern}
 import pl.edu.agh.workflow_patterns.synchronization.Sync
 
@@ -15,7 +16,6 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 object WorkFlowDsl {
-  import pl.edu.agh.utils.ActorUtils.Implicits.maxTimeForRes
 
   object SourceDataState {
     var sourceDataFList = List.empty[Future[Any]]
@@ -30,6 +30,15 @@ object WorkFlowDsl {
       }
       SourceDataState.sourceDataFList :+= f
     }
+    def =>>(in: In[Int])(implicit w: IWorkflow) = {
+      val workflow = w.asInstanceOf[Workflow[Any, Any]]
+      in.data = List.empty[Int]
+      source.data.foreach { d =>
+        in.data :+= d
+      }
+      val resF = workflow.block(workflow.ins, workflow.outs)
+      Await.ready(resF, Duration.Inf)
+    }
   }
 
   implicit class StrSourceDataToWorkflow(source: StringSource) {
@@ -40,6 +49,15 @@ object WorkFlowDsl {
         }
       }
       SourceDataState.sourceDataFList :+= f
+    }
+    def =>>(in: In[String])(implicit w: IWorkflow) = {
+      val workflow = w.asInstanceOf[Workflow[Any, Any]]
+      in.data = List.empty[String]
+      source.data.foreach { d =>
+        in.data :+= d
+      }
+      val resF = workflow.block(workflow.ins, workflow.outs)
+      Await.ready(resF, Duration.Inf)
     }
   }
 
@@ -52,6 +70,15 @@ object WorkFlowDsl {
       }
       SourceDataState.sourceDataFList :+= f
     }
+    def =>>(in: In[Any])(implicit w: IWorkflow) = {
+      val workflow = w.asInstanceOf[Workflow[Any, Any]]
+      in.data = List.empty[Any]
+      source.data.foreach { d =>
+        in.data :+= d
+      }
+      val resF = workflow.block(workflow.ins, workflow.outs)
+      Await.ready(resF, Duration.Inf)
+    }
   }
 
   implicit class AnySourceDataToWorkflow(source: AnySource) {
@@ -62,6 +89,15 @@ object WorkFlowDsl {
         }
       }
       SourceDataState.sourceDataFList :+= f
+    }
+    def =>>(in: In[Any])(implicit w: IWorkflow) = {
+      val workflow = w.asInstanceOf[Workflow[Any, Any]]
+      in.data = List.empty[Any]
+      source.data.foreach { d =>
+        in.data :+= d
+      }
+      val resF = workflow.block(workflow.ins, workflow.outs)
+      Await.ready(resF, Duration.Inf)
     }
   }
 

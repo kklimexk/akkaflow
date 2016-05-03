@@ -12,9 +12,13 @@ class Sink[R] extends Actor with ActorLogging {
       //log.info("CHILD")
       out :+= data
     case GetOut =>
-      sender ! out
+      val o = out
+      out = List.empty[R]
+      sender ! o
     case GetGroupedOut(size: Int) =>
-      sender ! out.grouped(size)
+      val o = out
+      out = List.empty[R]
+      sender ! o.grouped(size)
     case Get =>
       sender ! this
   }

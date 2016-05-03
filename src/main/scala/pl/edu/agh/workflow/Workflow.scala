@@ -6,12 +6,21 @@ import pl.edu.agh.utils.ActorUtils._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-class Workflow[T, R](name: String, numOfIns: Int, numOfOuts: Int, block: => (Seq[In[T]], Seq[Out[R]]) => Future[Seq[Out[R]]]) extends AbstractWorkflow[T, R](name, numOfIns, numOfOuts) with Runnable[R] {
+trait IWorkflow
+
+class Workflow[T, R](name: String, numOfIns: Int, numOfOuts: Int, var block: (Seq[In[T]], Seq[Out[R]]) => Future[Seq[Out[R]]]) extends AbstractWorkflow[T, R](name, numOfIns, numOfOuts) with Runnable[R] with IWorkflow {
   def run: Seq[Out[R]] = {
     val resF = block(ins, outs)
     Await.ready(resF, Duration.Inf)
     system.terminate
     outs
+  }
+  def start = {
+    val resF = block(ins, outs)
+    Await.ready(resF, Duration.Inf)
+  }
+  def stop = {
+    system.terminate
   }
 }
 

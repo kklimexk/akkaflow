@@ -1,4 +1,4 @@
-package pl.edu.agh.main
+package pl.edu.agh.examples
 
 import pl.edu.agh.flows._
 import pl.edu.agh.workflow.Workflow

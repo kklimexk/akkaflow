@@ -1,4 +1,4 @@
-package pl.edu.agh.main
+package pl.edu.agh.examples
 
 import pl.edu.agh.actions.{Action, Outs}
 import pl.edu.agh.dsl.WorkFlowDsl._

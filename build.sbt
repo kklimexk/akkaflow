@@ -1,4 +1,4 @@
-name := """workflow-patterns"""
+name := """akkaflow"""
 
 version := "4.2"
 

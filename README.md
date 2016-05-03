@@ -1,4 +1,4 @@
-# workflow-patterns #
+# Akkaflow #
 
 **Uruchomienie aplikacji:**
 

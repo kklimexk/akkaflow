@@ -26,7 +26,7 @@ Creating simple workflow:
 
 
 ```
-#!Scala
+#Scala
 
 val sqr = { (in: Int, outs: Outs) =>
   outs().foreach(out => in * in =>> out)

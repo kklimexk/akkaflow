@@ -25,7 +25,7 @@ object SyncMain extends App {
     action = sum
   )
 
-  val mulProc = Merge (
+  val mulProc = Merge[List[Int], Int] (
     name = "mulProc",
     numOfOuts = 1,
     action = mul
@@ -38,7 +38,8 @@ object SyncMain extends App {
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       ins(0) ~>> sumProc
       ins(1) ~>> sumProc
-      sumProc.outs(0) ~>> outs(0)
+      sumProc.outs("out0").grouped(3) ~> mulProc
+      mulProc.outs(0) ~>> outs(0)
     }
   )
 

@@ -1,5 +1,7 @@
 # **Akkaflow** #
 
+[![Build Status](https://travis-ci.org/kkrzys/akkaflow.svg?branch=master)](https://travis-ci.org/kkrzys/akkaflow)
+
 *Akkaflow* - workflow DSL library for scientific computations based on Akka actors.
 
 This project was created as a part of the master thesis.

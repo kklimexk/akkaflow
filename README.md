@@ -33,7 +33,7 @@ val sqr = { (in: Int, outs: Outs) =>
   outs().foreach(out => in * in =>> out)
 }
 
-val splitProc = Split[Int, Int] (
+val splitProc = Process[Int, Int] (
   name = "splitProc",
   numOfOuts = 3,
   action = sqr

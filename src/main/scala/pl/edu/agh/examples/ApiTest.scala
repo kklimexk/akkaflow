@@ -44,7 +44,7 @@ object ApiTest extends App {
 
   val splitProc = Process[String, String] (
     name = "splitProc",
-    outs = Seq("wyj1", "wyj2", "wyj3"),
+    outs = ("wyj1", "wyj2", "wyj3"),
     action = (in: String, outs: Outs) => outs().foreach(out => in =>> out)
   )
 

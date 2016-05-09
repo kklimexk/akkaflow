@@ -20,7 +20,7 @@ object FirstTest extends App {
 
   val sqrProc = Process[Int, Int] (
     name = "sqrProc",
-    outs = Seq("o1", "output2"),
+    outs = ("o1", "output2"),
     action = sqr
   )
 

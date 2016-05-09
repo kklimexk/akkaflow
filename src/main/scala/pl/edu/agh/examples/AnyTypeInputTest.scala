@@ -38,14 +38,14 @@ object AnyTypeInputTest extends App {
 
   val sumSyncProc = Sync[Any, Any] (
     name = "sumProc",
-    ins = Seq("firstIn", "secondIn", "thirdIn"),
-    outs = Seq("sumOut_1", "sumOut_2"),
+    ins = ("firstIn", "secondIn", "thirdIn"),
+    outs = ("sumOut_1", "sumOut_2"),
     action = sumOnlyNumbers
   )
 
   val mergeProc = Process[Seq[Any], Any] (
     name = "mergeProc",
-    outs = Seq("firstOut", "secondOut"),
+    outs = ("firstOut", "secondOut"),
     action = sum
   )
 

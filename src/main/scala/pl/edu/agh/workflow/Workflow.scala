@@ -1,7 +1,7 @@
 package pl.edu.agh.workflow
 
-import pl.edu.agh.flows.{In, Out}
 import pl.edu.agh.utils.ActorUtils._
+import pl.edu.agh.workflow.elements.{In, Out}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

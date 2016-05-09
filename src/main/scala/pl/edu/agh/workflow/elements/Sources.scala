@@ -1,4 +1,4 @@
-package pl.edu.agh.flows
+package pl.edu.agh.workflow.elements
 
 sealed trait ISource
 case class Source(data: Range) extends ISource

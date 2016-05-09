@@ -10,7 +10,7 @@ This project was created as a part of the master thesis.
 
 ## Goal ##
 
-The aim of this library is to provide a simple library to program workflows. For this purpose was created a dedicated API - internal DSL to create workflows as simple as possible.
+The aim of this project is to provide a simple library to program workflows. For this purpose was created a dedicated API - internal DSL to create workflows as simple as possible.
 
 ## Running examples: ##
 

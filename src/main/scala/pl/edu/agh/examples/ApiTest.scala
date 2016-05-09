@@ -1,22 +1,22 @@
 package pl.edu.agh.examples
 
 import pl.edu.agh.actions.{Ins, Outs}
-import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
-import pl.edu.agh.workflow_patterns._
+import pl.edu.agh.workflow.elements.{In, Out, Source}
+import pl.edu.agh.workflow_processes._
 
 object ApiTest extends App {
 
-  val mergeProc = Merge[Int, Int] (
+  val mergeProc = Process[Int, Int] (
     name = "mergeProc",
     numOfOuts = 2,
     action = (in: Int, outs: Outs) => (in * in) =>> outs("out1")
   )
 
-  val choiceProc = Choice[Int, Int] (
+  val choiceProc = Process[Int, Int] (
     name = "choiceProc",
     numOfOuts = 2,
     action = { (in: Int, outs: Outs) =>
@@ -36,13 +36,13 @@ object ApiTest extends App {
     }
   )
 
-  val mergeProc2 = Merge[Double, String] (
+  val mergeProc2 = Process[Double, String] (
     name = "mergeProc2",
     numOfOuts = 3,
     action = { in: Double => implicit outs: Outs => in.toString =>> "out1" }
   )
 
-  val splitProc = Split[String, String] (
+  val splitProc = Process[String, String] (
     name = "splitProc",
     outs = Seq("wyj1", "wyj2", "wyj3"),
     action = (in: String, outs: Outs) => outs().foreach(out => in =>> out)

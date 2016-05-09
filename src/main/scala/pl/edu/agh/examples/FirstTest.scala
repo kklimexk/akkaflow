@@ -2,11 +2,11 @@ package pl.edu.agh.examples
 
 import pl.edu.agh.actions.Outs
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns._
+import pl.edu.agh.workflow.elements.{In, Out, Source}
+import pl.edu.agh.workflow_processes._
 
 object FirstTest extends App {
 
@@ -18,13 +18,13 @@ object FirstTest extends App {
     in.reduceLeft[Int](_+_) =>> outs("out0")
   }
 
-  val sqrProc = Merge[Int, Int] (
+  val sqrProc = Process[Int, Int] (
     name = "sqrProc",
     outs = Seq("o1", "output2"),
     action = sqr
   )
 
-  val sumProc = Merge[List[Int], Int] (
+  val sumProc = Process[List[Int], Int] (
     name = "sumProc",
     numOfOuts = 2,
     action = sum

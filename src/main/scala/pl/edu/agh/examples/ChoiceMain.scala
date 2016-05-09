@@ -2,12 +2,12 @@ package pl.edu.agh.examples
 
 import pl.edu.agh.actions.Outs
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows._
 import pl.edu.agh.utils.Utils.crc32
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
-import pl.edu.agh.workflow_patterns._
+import pl.edu.agh.workflow.elements.{In, Out, StringSource}
+import pl.edu.agh.workflow_processes._
 
 object ChoiceMain extends App {
 
@@ -21,13 +21,13 @@ object ChoiceMain extends App {
     in =>> outs("out1")
   }
 
-  val choiceProc = Choice[String, String] (
+  val choiceProc = Process[String, String] (
     name = "choice",
     numOfOuts = 3,
     action = choiceAction
   )
 
-  val mergeProc = Merge[String, String] (
+  val mergeProc = Process[String, String] (
     name = "merge",
     numOfOuts = 2,
     action = mergeAction

@@ -5,9 +5,9 @@ import akka.util.Timeout
 import akka.pattern.ask
 
 import pl.edu.agh.messages.Get
-import pl.edu.agh.workflow_patterns.PatternActor
-import pl.edu.agh.workflow_patterns.merge.{MergeActor, Merge}
-import pl.edu.agh.workflow_patterns.synchronization.{Sync, SyncActor}
+import pl.edu.agh.workflow_processes.PatternActor
+import pl.edu.agh.workflow_processes.simple.{ProcessActor, Process}
+import pl.edu.agh.workflow_processes.synchronization.{Sync, SyncActor}
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -33,8 +33,8 @@ object ActorUtils {
         Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, R]]
       }
 
-      def toMergeActor[T, R]: MergeActor[T, R] = {
-        Await.result(actorF, timeout.duration).asInstanceOf[MergeActor[T, R]]
+      def toMergeActor[T, R]: ProcessActor[T, R] = {
+        Await.result(actorF, timeout.duration).asInstanceOf[ProcessActor[T, R]]
       }
 
       /*def out: List[Int] = {
@@ -49,6 +49,6 @@ object ActorUtils {
 
     }
     implicit def convertSyncToSyncActor[T, R](mSync: Sync[T, R]): SyncActor[T, R] = mSync.actor.toSyncActor
-    implicit def convertMergeToMergeActor[T, R](merge: Merge[T, R]): MergeActor[T, R] = merge.actor.toMergeActor
+    implicit def convertMergeToMergeActor[T, R](merge: Process[T, R]): ProcessActor[T, R] = merge.actor.toMergeActor
   }
 }

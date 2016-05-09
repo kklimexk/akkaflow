@@ -1,4 +1,4 @@
-package pl.edu.agh.workflow_patterns
+package pl.edu.agh.workflow_processes
 
 import akka.actor.Actor
 import pl.edu.agh.actions.Transformation

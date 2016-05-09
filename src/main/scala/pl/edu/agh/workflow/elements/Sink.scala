@@ -1,7 +1,7 @@
-package pl.edu.agh.flows
+package pl.edu.agh.workflow.elements
 
-import akka.actor.{ActorContext, ActorLogging, Props, Actor}
-import pl.edu.agh.messages.{GetGroupedOut, GetOut, Get, ResultMessage}
+import akka.actor.{Actor, ActorContext, ActorLogging, Props}
+import pl.edu.agh.messages.{Get, GetGroupedOut, GetOut, ResultMessage}
 
 class Sink[R] extends Actor with ActorLogging {
 

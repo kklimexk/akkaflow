@@ -1,6 +1,6 @@
 package pl.edu.agh.workflow
 
-import pl.edu.agh.flows.{In, Out}
+import pl.edu.agh.workflow.elements.{In, Out}
 
 abstract class AbstractWorkflow[T, R](name: String, numOfIns: Int, numOfOuts: Int) {
 

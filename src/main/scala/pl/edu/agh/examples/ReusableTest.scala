@@ -1,12 +1,12 @@
 package pl.edu.agh.examples
 
 import pl.edu.agh.actions.Outs
-import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns._
+import pl.edu.agh.workflow_processes._
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.dsl.WorkFlowDsl._
+import pl.edu.agh.workflow.elements.{In, Out, Source}
 
 /** Prosty test sprawdzajacy, czy da się uzyc tego samego wezla wiecej niz jeden raz
   * oraz czy mozna zmienic akcje gdy uzyjemy wezla po raz drugi i czy mozna
@@ -26,13 +26,13 @@ object ReusableTest extends App {
     outs().foreach(out => in =>> out)
   }
 
-  val mergeProc = Merge[Int, Int] (
+  val mergeProc = Process[Int, Int] (
     name = "mergeProc",
     numOfOuts = 2,
     action = mergeAct
   )
 
-  val splitProc = Split[Int, Int] (
+  val splitProc = Process[Int, Int] (
     name = "splitProc",
     numOfOuts = 3,
     action = act

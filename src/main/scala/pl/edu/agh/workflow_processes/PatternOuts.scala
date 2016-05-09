@@ -1,7 +1,7 @@
-package pl.edu.agh.workflow_patterns
+package pl.edu.agh.workflow_processes
 
 import akka.actor.ActorRef
-import pl.edu.agh.flows.Sink
+import pl.edu.agh.workflow.elements.Sink
 
 trait PatternOuts[R] { actor: PatternActor =>
   /**

@@ -1,7 +1,7 @@
 package pl.edu.agh.messages
 
-import pl.edu.agh.workflow_patterns.Pattern
-import pl.edu.agh.workflow_patterns.synchronization.Sync
+import pl.edu.agh.workflow_processes.Pattern
+import pl.edu.agh.workflow_processes.synchronization.Sync
 
 sealed trait PropagateDataMessage
 

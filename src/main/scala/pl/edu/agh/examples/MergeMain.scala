@@ -2,11 +2,11 @@ package pl.edu.agh.examples
 
 import pl.edu.agh.actions.{Action, Outs}
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.flows.{In, Out, Source}
 import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.workflow_patterns.merge.Merge
+import pl.edu.agh.workflow.elements.{In, Out, Source}
+import pl.edu.agh.workflow_processes._
 
 object MergeMain extends App {
 
@@ -18,25 +18,25 @@ object MergeMain extends App {
     in =>> outs("out1")
   }
 
-  val firstProc = Merge[Int, Int] (
+  val firstProc = Process[Int, Int] (
     name = "sumProc",
     numOfOuts = 2,
     action = firstAct
   )
 
-  val secondProc = Merge[Int, Int] (
+  val secondProc = Process[Int, Int] (
     name = "sqrProc",
     numOfOuts = 2,
     action = firstAct
   )
 
-  val thirdProc = Merge[Int, Int] (
+  val thirdProc = Process[Int, Int] (
     name = "thirdProc",
     numOfOuts = 2,
     action = secondAct
   )
 
-  val mergeProc = Merge[Int, Int] (
+  val mergeProc = Process[Int, Int] (
     name = "mergeProc",
     numOfOuts = 1,
     action = firstAct

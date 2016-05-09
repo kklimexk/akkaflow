@@ -1,4 +1,4 @@
-package pl.edu.agh.workflow_patterns
+package pl.edu.agh.workflow_processes
 
 import akka.actor.ActorRef
 import pl.edu.agh.actions.{ActionConverter, Ins, Outs}

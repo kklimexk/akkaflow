@@ -4,12 +4,12 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.ActorRef
 import pl.edu.agh.data_propagators.{PropagateDataActor, PropagateDataForSyncActor}
-import pl.edu.agh.flows._
 import pl.edu.agh.messages._
 import pl.edu.agh.utils.SinkUtils
+import pl.edu.agh.workflow.elements._
 import pl.edu.agh.workflow.{IWorkflow, Workflow}
-import pl.edu.agh.workflow_patterns.{IPattern, Pattern}
-import pl.edu.agh.workflow_patterns.synchronization.Sync
+import pl.edu.agh.workflow_processes.{IPattern, Pattern}
+import pl.edu.agh.workflow_processes.synchronization.Sync
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration

@@ -1,8 +1,8 @@
-package pl.edu.agh.workflow_patterns.synchronization
+package pl.edu.agh.workflow_processes.synchronization
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import pl.edu.agh.workflow_patterns.{PatternActor, PatternOuts}
+import pl.edu.agh.workflow_processes.{PatternActor, PatternOuts}
 
 import scala.util.control.Breaks._
 import akka.actor.{ActorLogging, Props}

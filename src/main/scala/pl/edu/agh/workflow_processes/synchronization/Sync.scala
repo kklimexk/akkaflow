@@ -1,11 +1,13 @@
-package pl.edu.agh.workflow_patterns.synchronization
+package pl.edu.agh.workflow_processes.synchronization
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
 import pl.edu.agh.actions._
-import pl.edu.agh.workflow_patterns.Pattern
+import pl.edu.agh.workflow_processes.Pattern
 
-//Sync Pattern with multiple inputs
+/**
+  * Synchronization process (input elements are synchronized)
+  */
 class Sync[T, R](name: String, numOfIns: Int, numOfOuts: Int, ins: Seq[String], outs: Seq[String], action: IMultipleAction[T, R]) extends Pattern[T, R] {
 
   //Ewentualnie mozna uzyc LinkedBlockingQueue

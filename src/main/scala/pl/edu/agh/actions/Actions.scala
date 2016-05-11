@@ -17,6 +17,9 @@ abstract class IMultipleAction[T, R] extends IAction[T, R] {
 case class EmptySingleAction[T, R]() extends ISingleAction[T, R] {
   override def execute(ins: T)(outs: Outs): Unit = ()
 }
+case class EmptyMultipleAction[T, R]() extends IMultipleAction[T, R] {
+  override def execute(ins: Ins[T])(outs: Outs): Unit = ()
+}
 //------------------------------------------------------------
 case class Action[T, R](action: (T, Outs) => Unit) extends ISingleAction[T, R] {
   def execute(in: T)(outs: Outs): Unit = {

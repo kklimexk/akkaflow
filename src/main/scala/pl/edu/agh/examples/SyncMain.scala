@@ -2,11 +2,11 @@ package pl.edu.agh.examples
 
 import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow.elements.{In, Out, Source}
 import pl.edu.agh.workflow_processes._
+import pl.edu.agh.workflow_processes.synchronization.SyncDsl._
 
 object SyncMain extends App {
 
@@ -18,12 +18,11 @@ object SyncMain extends App {
     in.reduceLeft[Int](_*_) =>> outs("out0")
   }
 
-  val sumProc = Sync[Int, Int] (
-    name = "sumProc",
-    numOfIns = 2,
-    numOfOuts = 2,
-    action = sum
-  )
+  val sumProc = Sync[Int, Int]
+    .name("sumProc")
+    .numOfIns(2)
+    .numOfOuts(2)
+    .action(sum)
 
   val mulProc = Process[List[Int], Int] (
     name = "mulProc",
@@ -36,6 +35,8 @@ object SyncMain extends App {
     numOfIns = 2,
     numOfOuts = 1,
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
+      import pl.edu.agh.utils.ActorUtils.Implicits._
+
       ins(0) ~>> sumProc
       ins(1) ~>> sumProc
       sumProc.outs("out0").grouped(3) ~> mulProc

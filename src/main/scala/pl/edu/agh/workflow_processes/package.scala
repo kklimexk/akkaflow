@@ -57,4 +57,6 @@ package object workflow_processes {
 
   def Sync[T, R](name: String, ins: Product, outs: Product, action: Ins[T] => Outs => Unit) =
     applySync[T, R](name, ins.productIterator.toList.map(_.toString), outs.productIterator.toList.map(_.toString), action)
+
+  def Sync[T, R] = applySync[T, R]
 }

@@ -7,6 +7,7 @@ import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.workflow.elements.{AnyRangeSource, AnySource, In, Out}
 import pl.edu.agh.workflow_processes._
 import pl.edu.agh.workflow_processes.simple.ProcessDsl._
+import pl.edu.agh.workflow_processes.synchronization.SyncDsl._
 
 /** Prosty test majacy sprawdzic czy mozna uzyc roznych typow danych dla wejsc */
 object AnyTypeInputTest extends App {
@@ -36,12 +37,11 @@ object AnyTypeInputTest extends App {
     res2 =>> "sumOut_2"
   }
 
-  val sumSyncProc = Sync[Any, Any] (
-    name = "sumProc",
-    ins = ("firstIn", "secondIn", "thirdIn"),
-    outs = ("sumOut_1", "sumOut_2"),
-    action = sumOnlyNumbers
-  )
+  val sumSyncProc = Sync[Any, Any]
+    .name("sumProc")
+    .inputs("firstIn", "secondIn", "thirdIn")
+    .outputs("sumOut_1", "sumOut_2")
+    .action(sumOnlyNumbers)
 
   val mergeProc = Process[Seq[Any], Any] (
     name = "mergeProc",

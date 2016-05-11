@@ -5,12 +5,12 @@ import pl.edu.agh.actions.{ISingleAction, Outs}
 import pl.edu.agh.messages._
 import pl.edu.agh.workflow_processes.{PatternActor, PatternOuts}
 
-class ProcessActor[T, R](numOfOuts: Int, outs: Seq[String], var action: ISingleAction[T, R]) extends PatternActor(numOfOuts, outs, action) with PatternOuts[R] with ActorLogging {
+class ProcessActor[T, R](numOfOuts: Int, outs: Seq[String], var _action: ISingleAction[T, R]) extends PatternActor(numOfOuts, outs, _action) with PatternOuts[R] with ActorLogging {
   def receive = {
     case DataMessage(data: T) =>
-      action.execute(data)(Outs(_outs))
+      _action.execute(data)(Outs(_outs))
     case ChangeAction(act: ISingleAction[T, R]) =>
-      action = act
+      _action = act
     /*case ChangeSendTo(outName) =>
       sendTo = outName*/
     case Get =>

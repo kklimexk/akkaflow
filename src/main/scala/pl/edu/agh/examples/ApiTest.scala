@@ -3,10 +3,10 @@ package pl.edu.agh.examples
 import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.workflow.elements.{In, Out, Source}
 import pl.edu.agh.workflow_processes._
+import pl.edu.agh.workflow_processes.simple.ProcessDsl._
 
 object ApiTest extends App {
 
@@ -36,23 +36,23 @@ object ApiTest extends App {
     }
   )
 
-  val mergeProc2 = Process[Double, String] (
-    name = "mergeProc2",
-    numOfOuts = 3,
-    action = { in: Double => implicit outs: Outs => in.toString =>> "out1" }
-  )
+  val mergeProc2 = Process[Double, String]
+    .name("mergeProc2")
+    .numOfOuts(3)
+    .action { in: Double => implicit outs: Outs => in.toString =>> "out1" }
 
-  val splitProc = Process[String, String] (
-    name = "splitProc",
-    outs = ("wyj1", "wyj2", "wyj3"),
-    action = (in: String, outs: Outs) => outs().foreach(out => in =>> out)
-  )
+  val splitProc = Process[String, String]
+    .name("splitProc")
+    .outputs("wyj1", "wyj2", "wyj3")
+    .action { (in: String, outs: Outs) => outs().foreach(out => in =>> out) }
 
   val w = Workflow (
     "Api Test Workflow",
     numOfIns = 3,
     numOfOuts = 3,
     (ins: Seq[In[Int]], outs: Seq[Out[String]]) => {
+      import pl.edu.agh.utils.ActorUtils.Implicits._
+
       ins(0) ~>> mergeProc
       ins(1) ~>> mergeProc
       ins(2) ~>> mergeProc

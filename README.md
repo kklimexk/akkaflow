@@ -1,6 +1,6 @@
 # **Akkaflow** #
 
-[![Build Status](https://travis-ci.org/kkrzys/akkaflow.svg?branch=master)](https://travis-ci.org/kkrzys/akkaflow)
+[![Build Status](https://travis-ci.org/kkrzys/akkaflow.svg?branch=master)](https://travis-ci.org/kkrzys/akkaflow) [![License](https://img.shields.io/badge/license-APACHE2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 *Akkaflow* - workflow DSL library for scientific computations based on Akka actors.
 

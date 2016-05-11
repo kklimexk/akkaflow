@@ -13,6 +13,10 @@ abstract class ISingleAction[T, R] extends IAction[T, R] {
 abstract class IMultipleAction[T, R] extends IAction[T, R] {
   def execute(ins: Ins[T])(outs: Outs): Unit
 }
+//-----------------------------------------------------------
+case class EmptySingleAction[T, R]() extends ISingleAction[T, R] {
+  override def execute(ins: T)(outs: Outs): Unit = ()
+}
 //------------------------------------------------------------
 case class Action[T, R](action: (T, Outs) => Unit) extends ISingleAction[T, R] {
   def execute(in: T)(outs: Outs): Unit = {
@@ -37,7 +41,7 @@ case class MultipleAction2[T, R](action: Ins[T] => Outs => Unit) extends IMultip
     action(ins)(outs)
   }
 }
-
+//------------------------------------------------------------
 object ActionDsl {
   implicit class SendResultToOutput[R](result: R) {
     def =>>(out: ActorRef) = {

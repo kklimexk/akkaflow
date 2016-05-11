@@ -14,6 +14,7 @@ package object workflow_processes {
   def Process[T, R](name: String, outs: Seq[String], action: T => Outs => Unit) = apply[T, R](name, outs, action)
   def Process[T, R](name: String, outs: Product, action: (T, Outs) => Unit) = apply[T, R](name, outs.productIterator.toList.map(_.toString), action)
   def Process[T, R](name: String, outs: Product, action: T => Outs => Unit) = apply[T, R](name, outs.productIterator.toList.map(_.toString), action)
+  def Process[T, R] = apply[T, R]
 
   def Sync[T, R](name: String, numOfIns: Int, numOfOuts: Int, action: (Ins[T], Outs) => Unit) =
     applySync[T, R](name, numOfIns, numOfOuts, action)

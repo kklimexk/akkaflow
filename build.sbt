@@ -1,6 +1,6 @@
 name := """akkaflow"""
 
-version := "4.2"
+version := "4.3"
 
 scalaVersion := "2.11.7"
 

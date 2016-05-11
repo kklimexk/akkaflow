@@ -13,8 +13,8 @@ trait PatternOuts[R] { actor: PatternActor =>
       for (i <- 0 until actor.numOfOuts) {
         outsMap += (("out" + i) -> Sink[R]("out" + i, actor.context))
       }
-    } else if (actor.outputs.nonEmpty) {
-      outsMap = outputs.map(o => o -> Sink[R](o, actor.context))(collection.breakOut)
+    } else if (actor._outputs.nonEmpty) {
+      outsMap = _outputs.map(o => o -> Sink[R](o, actor.context))(collection.breakOut)
     }
     outsMap
   }

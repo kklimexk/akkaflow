@@ -1,12 +1,12 @@
 package pl.edu.agh.examples
 
 import pl.edu.agh.workflow.Workflow
-import pl.edu.agh.utils.ActorUtils.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.actions.ActionDsl._
 import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.workflow.elements.{AnyRangeSource, AnySource, In, Out}
 import pl.edu.agh.workflow_processes._
+import pl.edu.agh.workflow_processes.simple.ProcessDsl._
 
 /** Prosty test majacy sprawdzic czy mozna uzyc roznych typow danych dla wejsc */
 object AnyTypeInputTest extends App {
@@ -49,17 +49,18 @@ object AnyTypeInputTest extends App {
     action = sum
   )
 
-  val splitProc = Process[Any, Any] (
-    name = "splitProc",
-    numOfOuts = 3,
-    action = (in: Any, outs: Outs) => outs().foreach(out => in =>> out)
-  )
+  val splitProc = Process[Any, Any]
+    .name("splitProc")
+    .numOfOuts(3)
+    .action { (in: Any, outs: Outs) => outs().foreach(out => in =>> out) }
 
   val w = Workflow (
     "Any type input test",
     numOfIns = 3,
     numOfOuts = 3,
     (ins: Seq[In[Any]], outs: Seq[Out[Any]]) => {
+      import pl.edu.agh.utils.ActorUtils.Implicits._
+
       ins(0) ~>> sumSyncProc
       ins(1) ~>> sumSyncProc
       ins(2) ~>> sumSyncProc

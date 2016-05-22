@@ -113,6 +113,31 @@ object WorkFlowDsl {
     }
   }
 
+  implicit class ParametrizedSourceDataToWorkflow[T](source: ParametrizedSource[T]) {
+    def ~>(in: In[T]) = {
+      val f = Future {
+        source.data.foreach { d =>
+          in.data :+= d
+        }
+      }
+      SourceDataState.sourceDataFList :+= f
+    }
+    def =>>(in: In[T])(implicit w: IWorkflow) = {
+      val workflow = w.asInstanceOf[Workflow[Any, Any]]
+      workflow.clearIns()
+
+      //in.data = List.empty[Any]
+      source.data.foreach { d =>
+        in.data :+= d
+      }
+
+      val resF = workflow.block(workflow.ins, workflow.outs)
+      Await.ready(resF, Duration.Inf)
+    }
+  }
+
+  //-------------------------------------------------------------------
+
   object MSyncId {
     var uniqueId = new AtomicInteger(0)
     def resetUniqueId = uniqueId = new AtomicInteger(0)
@@ -129,6 +154,8 @@ object WorkFlowDsl {
       }
     }
   }
+
+  //-------------------------------------------------------------------
 
   object DataState {
     var dataList = List.empty[Future[Any]]

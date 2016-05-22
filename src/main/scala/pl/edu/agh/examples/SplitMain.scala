@@ -3,7 +3,7 @@ package pl.edu.agh.examples
 import pl.edu.agh.actions.Outs
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.utils.ActorUtils.Implicits._
-import pl.edu.agh.actions.ActionDsl._
+import pl.edu.agh.actions.ActionDsl.Implicits._
 import pl.edu.agh.dsl.WorkFlowDsl._
 import pl.edu.agh.workflow.elements._
 import pl.edu.agh.workflow_processes._

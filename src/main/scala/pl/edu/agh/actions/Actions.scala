@@ -46,15 +46,17 @@ case class MultipleAction2[T, R](action: Ins[T] => Outs => Unit) extends IMultip
 }
 //------------------------------------------------------------
 object ActionDsl {
-  implicit class SendResultToOutput[R](result: R) {
-    def =>>(out: ActorRef) = {
-      out ! ResultMessage(result)
-    }
-    def =>>(out: (String, ActorRef)) = {
-      out._2 ! ResultMessage(result)
-    }
-    def =>>(outName: String)(implicit outs: Outs) = {
-      outs(outName) ! ResultMessage(result)
+  object Implicits {
+    implicit class SendResultToOutput[R](result: R) {
+      def =>>(out: ActorRef) = {
+        out ! ResultMessage(result)
+      }
+      def =>>(out: (String, ActorRef)) = {
+        out._2 ! ResultMessage(result)
+      }
+      def =>>(outName: String)(implicit outs: Outs) = {
+        outs(outName) ! ResultMessage(result)
+      }
     }
   }
 }

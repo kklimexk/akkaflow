@@ -2,7 +2,7 @@ package pl.edu.agh.examples
 
 import pl.edu.agh.actions.{Ins, Outs}
 import pl.edu.agh.dsl.WorkFlowDsl._
-import pl.edu.agh.actions.ActionDsl._
+import pl.edu.agh.actions.ActionDsl.Implicits._
 import pl.edu.agh.workflow.Workflow
 import pl.edu.agh.workflow.elements.{In, Out, Source}
 import pl.edu.agh.workflow_processes._

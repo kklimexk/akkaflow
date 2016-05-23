@@ -13,11 +13,13 @@ class Sink[R] extends Actor with ActorLogging {
       out :+= data
     case GetOut =>
       val o = out
-      out = List.empty[R]
+      //This line is needed to feed workflow feature
+      //out = List.empty[R]
       sender ! o
     case GetGroupedOut(size: Int) =>
       val o = out
-      out = List.empty[R]
+      //This line is needed to feed workflow feature
+      //out = List.empty[R]
       sender ! o.grouped(size)
     case Get =>
       sender ! this

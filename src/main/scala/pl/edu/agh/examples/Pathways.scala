@@ -53,7 +53,12 @@ object Pathways extends App {
       val fileNameEntry = pathId + "-entry.txt"
       val pathwayEntry = Source.fromURL("http://rest.kegg.jp/get/" + pathId).mkString
 
-      new PrintWriter("./pathway_entries/" + fileNameEntry) { write(pathwayEntry); close() }
+      val dir = new File("./pathway_entries/")
+      if (!dir.exists()) dir.mkdirs()
+
+      val file = new File("./pathway_entries/" + fileNameEntry)
+
+      new PrintWriter(file) { write(pathwayEntry); close() }
 
       fileNameEntry =>> outs("pathwayEntry")
     }
@@ -64,7 +69,12 @@ object Pathways extends App {
     outs = Seq("pathwayImage"),
     action = { (pathId: String, outs: Outs) =>
       val fileNameImage = pathId + "-image.png"
-      new URL("http://rest.kegg.jp/get/" + pathId + "/image") #> new File("./pathway_images/" + fileNameImage) !
+      val dir = new File("./pathway_images/")
+      if (!dir.exists()) dir.mkdirs()
+
+      val file = new File("./pathway_images/" + fileNameImage)
+
+      new URL("http://rest.kegg.jp/get/" + pathId + "/image") #> file !
 
       fileNameImage =>> outs("pathwayImage")
     }
@@ -103,7 +113,7 @@ object Pathways extends App {
     }
   )
 
-  ParametrizedSource[Int](945003) ~> w.ins(0)
+  ParametrizedSource[Int](945003, 945250, 948873) ~> w.ins(0)
 
   val res = w.run
   println(res)

@@ -19,7 +19,7 @@ object ActorUtils {
   object Implicits {
 
     implicit val maxTimeForRes = 100
-    implicit val timeout = Timeout(10 seconds)
+    implicit val timeout = Timeout(20 seconds)
 
     implicit class ConverterToActor(actorRef: ActorRef) {
 

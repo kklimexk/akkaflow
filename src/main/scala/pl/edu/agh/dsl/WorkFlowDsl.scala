@@ -153,6 +153,18 @@ object WorkFlowDsl {
         case _ => PropagateDataActor(in.data) ! PropagateData(elem)
       }
     }
+    def ~>[R](elem: Pattern[T, R]) = {
+      if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
+        val futureL = Future.sequence(DataState.dataList)
+        Await.ready(futureL, Duration.Inf)
+      }
+      elem match {
+        case e: Sync[T, R] =>
+          PropagateDataForSyncActor(in.data) ! PropagateDataForSync(e, MSyncId.uniqueId.getAndIncrement())
+        case _ => PropagateDataActor(in.data) ! PropagateData(elem)
+      }
+      DataState.prevPattern = Some(elem)
+    }
   }
 
   //-------------------------------------------------------------------

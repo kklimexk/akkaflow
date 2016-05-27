@@ -155,6 +155,7 @@ object WorkFlowDsl {
     }
     def ~>[R](elem: Pattern[T, R]) = {
       if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
+        MSyncId.resetUniqueId
         val futureL = Future.sequence(DataState.dataList)
         Await.ready(futureL, Duration.Inf)
       }
@@ -183,6 +184,7 @@ object WorkFlowDsl {
 
     def ~>[T](elem: Pattern[T, R]) = {
       if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
+        MSyncId.resetUniqueId
         val futureL = Future.sequence(DataState.dataList)
         Await.ready(futureL, Duration.Inf)
       }
@@ -191,7 +193,8 @@ object WorkFlowDsl {
         case data: List[R] => elem match {
           case e: Sync[T, R] =>
             PropagateDataForSyncActor(data) ! PropagateDataForSync(e, MSyncId.uniqueId.getAndIncrement())
-          case _ => PropagateDataActor(data) ! PropagateData(elem)
+          case _ =>
+            PropagateDataActor(data) ! PropagateData(elem)
         }
       }
       DataState.prevPattern = Some(elem)
@@ -222,6 +225,7 @@ object WorkFlowDsl {
   implicit class ForwardIteratorDataToNext[R](dataF: Future[Iterator[List[R]]]) {
     def ~>[T](elem: Pattern[T, R]) = {
       if (DataState.prevPattern.isDefined && DataState.prevPattern.get != elem) {
+        MSyncId.resetUniqueId
         val futureL = Future.sequence(DataState.dataList)
         Await.ready(futureL, Duration.Inf)
       }

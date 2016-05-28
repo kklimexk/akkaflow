@@ -14,6 +14,10 @@ import pl.edu.agh.workflow_processes.{Process => Proc}
 import scala.xml.{Node, Text, XML}
 import sys.process._
 
+/**
+  * This is the Comet workflow, originally developed in the Kepler system.
+  * The workflow requires "R" tool.
+  */
 object Comet extends App {
 
   val readDataSets = Sync[Any, List[(Map[String, Node], Map[String, Node])]] (
@@ -22,9 +26,10 @@ object Comet extends App {
     outs = Seq("stations:dataSetsCount"),
     action = { (ins: Ins[Any], outs: Outs) =>
       val xml = XML.loadFile(ins("xmlData").asInstanceOf[String])
-      val config = ins("config").asInstanceOf[(Map[String, (String, String, String)], Map[String, Double], Map[String, Double], Map[String, Int])]
+      val config = ins("config").asInstanceOf[Map[String, Any]]
+      val xpath = config("xpath").asInstanceOf[(String, String, String)]
 
-      val xmlData = xml \\ config._1("xpath")._1 filter (_ \ config._1("xpath")._2 contains Text(config._1("xpath")._3))
+      val xmlData = xml \\ xpath._1 filter (_ \ xpath._2 contains Text(xpath._3))
 
       var data = List.empty[(Map[String, Node], Map[String, Node])]
       xmlData.foreach { node =>
@@ -36,9 +41,9 @@ object Comet extends App {
     }
   )
 
-  val partitionData = Proc[List[(Map[String, Node], Map[String, Node])], Any] (
+  val partitionData = Proc[List[(Map[String, Node], Map[String, Node])], (Array[Array[Array[Double]]], List[Node])] (
     name = "partitionData",
-    outs = Seq("dataParts", "collectionName"),
+    outs = Seq("dataParts"),
     action = { (stations: List[(Map[String, Node], Map[String, Node])], outs: Outs) =>
       val pXmlData = stations.map(_._2("value"))
       val cname = stations.map(_._1("collectionName"))
@@ -75,20 +80,19 @@ object Comet extends App {
 
       }
 
-      cname =>> outs("collectionName")
-      data =>> outs("dataParts")
+      (data, cname) =>> outs("dataParts")
     }
   )
 
-  val computeStats = Sync[Any, String] (
+  val computeStats = Sync[Any, (List[(Map[String, Double], Map[String, Double], Map[String, Double], Map[String, Double])], List[Node])] (
     name = "computeStats",
-    ins = Seq("dataParts", "collectionName", "config"),
-    outs = Seq("stats", "collectionName"),
+    ins = Seq("dataParts", "config"),
+    outs = Seq("stats"),
     action = { (ins: Ins[Any], outs: Outs) =>
-      val config = ins("config").asInstanceOf[(Map[String, (String, String, String)], Map[String, Double], Map[String, Double], Map[String, Int])]
-      val tBase = config._4("baseTemp")
-      val dsets = ins("dataParts").asInstanceOf[Array[Array[Array[Double]]]](0)
-      val cname = ins("collectionName").asInstanceOf[List[Node]]
+      val cname = ins("dataParts").asInstanceOf[(Array[Array[Array[Double]]], List[Node])]._2
+      val dsets = ins("dataParts").asInstanceOf[(Array[Array[Array[Double]]], List[Node])]._1(0)
+      val config = ins("config").asInstanceOf[Map[String, Any]]
+      val tBase = config("baseTemp").asInstanceOf[Int]
       var stats = List.empty[(Map[String, Double], Map[String, Double], Map[String, Double], Map[String, Double])]
       dsets.foreach { d =>
         val t = d(0)
@@ -102,25 +106,22 @@ object Comet extends App {
         stats :+= res
       }
 
-      cname =>> outs("collectionName")
-      stats =>> outs("stats")
+      (stats, cname) =>> outs("stats")
     }
   )
 
-  val plotGraphs = Sync[Any, Unit] (
+  val plotGraphs = Proc[(List[(Map[String, Double], Map[String, Double], Map[String, Double], Map[String, Double])], List[Node]), Unit] (
     name = "plotData",
-    ins = Seq("stats", "collectionName"),
     outs = Seq("graph"),
-    action = { (ins: Ins[Any], outs: Outs) =>
+    action = { (stats: (List[(Map[String, Double], Map[String, Double], Map[String, Double], Map[String, Double])], List[Node]), outs: Outs) =>
       val dirPath = "./rlang/"
       val dir = new File(dirPath)
       if (!dir.exists()) dir.mkdirs()
 
-      val cname = ins("collectionName").asInstanceOf[List[Node]]
-      val filename = "plot-" + cname.toString() + "-" + new Date().getTime
+      val filename = "plot-" + stats._2.mkString + "-" + new Date().getTime
       val rScript = "\n" +
-        "data <- read.csv(\"" + filename + ".csv\")\n" +
-        "png(filename=\"" + filename + ".png\")\n" +
+        "data <- read.csv(\"" + dirPath + filename + ".csv\")\n" +
+        "png(filename=\"" + dirPath + filename + ".png\")\n" +
         "with(data, plot(timestamp, min, type=\"l\", col=\"red\", ylab=\"\", ylim=c(0.0,100.0)))\n" +
         "with(data, lines(timestamp, max, type=\"l\", col=\"blue\"))\n" +
         "with(data, lines(timestamp, gdd, type=\"l\", col=\"green\"))\n" +
@@ -130,10 +131,9 @@ object Comet extends App {
       val file = new File(dirPath + filename + ".R")
       new PrintWriter(file) { write(rScript); close() }
 
-      val stats = ins("stats").asInstanceOf[List[(Map[String, Double], Map[String, Double], Map[String, Double], Map[String, Double])]]
       var data = "timestamp,min,max,gdd\n"
 
-      stats.foreach { s =>
+      stats._1.foreach { s =>
         data += s._1("timestamp") + "," + s._2("min") + "," + s._3("max") + "," + s._4("gdd") + "\r\n"
       }
 
@@ -150,7 +150,7 @@ object Comet extends App {
     name = "collectGraphs",
     outs = Seq("emptyOut"),
     action = { (graph: Unit, outs: Outs) =>
-      println("All plots generated, exiting...")
+      println("All plots generated, exiting...");
       () =>> outs("emptyOut")
     }
   )
@@ -159,7 +159,7 @@ object Comet extends App {
     name = "Comet example workflow",
     numOfIns = 2,
     numOfOuts = 1,
-    (ins: Seq[In[Any]], outs: Seq[Out[Unit]]) => {
+    (ins: Seq[In[Any]], outs: Seq[Out[Any]]) => {
       import pl.edu.agh.utils.ActorUtils.Implicits._
 
       ins(0) ~>> readDataSets
@@ -168,11 +168,9 @@ object Comet extends App {
       readDataSets.outs(0) ~> partitionData
 
       partitionData.outs("dataParts") ~> computeStats
-      partitionData.outs("collectionName") ~> computeStats
       ins(1) ~> computeStats
 
       computeStats.outs("stats") ~> plotGraphs
-      computeStats.outs("collectionName") ~> plotGraphs
 
       plotGraphs.outs("graph") ~> collectPlots
 
@@ -182,8 +180,10 @@ object Comet extends App {
 
   AnySource("./src/main/scala/pl/edu/agh/examples/comet/data.xml") ~> w.ins(0)
   AnySource(
-    (Map("xpath" -> ("Collection", "@label", "station")), Map("start_time" -> 1.196499599E9),
-      Map("end_time" -> 1.197359999E9), Map("baseTemp" -> 10))
+    Map("xpath" -> ("Collection", "@label", "station"),
+          "start_time" -> 1.196499599E9,
+          "end_time" -> 1.197359999E9,
+          "baseTemp" -> 10)
   ) ~> w.ins(1)
 
   val res = w.run

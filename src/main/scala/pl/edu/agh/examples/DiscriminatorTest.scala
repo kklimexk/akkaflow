@@ -29,10 +29,11 @@ object DiscriminatorTest extends App {
 
   val w = Workflow (
     "Example discriminator workflow",
-    numOfIns = 1,
+    numOfIns = 2,
     numOfOuts = 3,
     (ins: Seq[In[Int]], outs: Seq[Out[Int]]) => {
       ins(0) ~>> discriminatorProcess
+      ins(1) ~>> discriminatorProcess
       discriminatorProcess.outs(0) ~>> outs(0)
       discriminatorProcess.outs(1) ~>> outs(1)
       discriminatorProcess.outs(2) ~>> outs(2)
@@ -40,6 +41,8 @@ object DiscriminatorTest extends App {
   )
 
   Source(1 to 10) ~> w.ins(0)
+  Source(11 to 20) ~> w.ins(1)
+
   val res = w.run
   println(res)
   println(w)

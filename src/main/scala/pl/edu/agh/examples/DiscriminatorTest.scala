@@ -14,9 +14,8 @@ import scala.util.Random
 // Discriminator Pattern example
 object DiscriminatorTest extends App {
 
-  val discOut = Random.nextInt(3)
-
   val sqr = { (in: Int, outs: Outs) =>
+    val discOut = Random.nextInt(outs.size)
     outs().foreach { out =>
       if (outs(discOut) isNotEqualTo out) in * in =>> out
     }

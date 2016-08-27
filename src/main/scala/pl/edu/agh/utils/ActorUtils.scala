@@ -33,7 +33,7 @@ object ActorUtils {
         Await.result(actorF, timeout.duration).asInstanceOf[SyncActor[T, R]]
       }
 
-      def toMergeActor[T, R]: ProcessActor[T, R] = {
+      def toProcessActor[T, R]: ProcessActor[T, R] = {
         Await.result(actorF, timeout.duration).asInstanceOf[ProcessActor[T, R]]
       }
 
@@ -49,6 +49,6 @@ object ActorUtils {
 
     }
     implicit def convertSyncToSyncActor[T, R](mSync: Sync[T, R]): SyncActor[T, R] = mSync.actor.toSyncActor
-    implicit def convertMergeToMergeActor[T, R](merge: Process[T, R]): ProcessActor[T, R] = merge.actor.toMergeActor
+    implicit def convertProcessToProcessActor[T, R](merge: Process[T, R]): ProcessActor[T, R] = merge.actor.toProcessActor
   }
 }

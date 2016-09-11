@@ -8,6 +8,7 @@ import pl.edu.agh.messages._
 import pl.edu.agh.utils.SinkUtils
 import pl.edu.agh.workflow.elements._
 import pl.edu.agh.workflow.{IWorkflow, Workflow}
+import pl.edu.agh.workflow_processes.discriminator.Disc
 import pl.edu.agh.workflow_processes.{IPattern, Pattern}
 import pl.edu.agh.workflow_processes.synchronization.Sync
 
@@ -150,6 +151,8 @@ object WorkFlowDsl {
       elem match {
         case e: Sync[T, R] =>
           PropagateDataForSyncActor(in.data) ! PropagateDataForSync(e, MSyncId.uniqueId.getAndIncrement())
+        case e: Disc[T, R] =>
+          PropagateDataForSyncActor(in.data) ! PropagateDataForDisc(e, MSyncId.uniqueId.getAndIncrement())
         case _ => PropagateDataActor(in.data) ! PropagateData(elem)
       }
     }
@@ -161,6 +164,8 @@ object WorkFlowDsl {
       elem match {
         case e: Sync[T, R] =>
           PropagateDataForSyncActor(in.data) ! PropagateDataForSync(e, MSyncId.uniqueId.getAndIncrement())
+        case e: Disc[T, R] =>
+          PropagateDataForSyncActor(in.data) ! PropagateDataForDisc(e, MSyncId.uniqueId.getAndIncrement())
         case _ => PropagateDataActor(in.data) ! PropagateData(elem)
       }
 
@@ -193,6 +198,8 @@ object WorkFlowDsl {
         case data: List[R] => elem match {
           case e: Sync[T, R] =>
             PropagateDataForSyncActor(data) ! PropagateDataForSync(e, MSyncId.uniqueId.getAndIncrement())
+          case e: Disc[T, R] =>
+            PropagateDataForSyncActor(data) ! PropagateDataForDisc(e, MSyncId.uniqueId.getAndIncrement())
           case _ =>
             PropagateDataActor(data) ! PropagateData(elem)
         }

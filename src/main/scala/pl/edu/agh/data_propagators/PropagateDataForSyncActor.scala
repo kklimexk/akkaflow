@@ -13,6 +13,14 @@ class PropagateDataForSyncActor[T](data: T) extends Actor {
           }
         case _ => throw new Exception("This type is not subclass of TraversableOnce!")
       }
+    case PropagateDataForDisc(elem, uId) =>
+      data match {
+        case res: TraversableOnce[T] =>
+          res.foreach { d =>
+            elem.actor ! SyncDataMessage(d, uId)
+          }
+        case _ => throw new Exception("This type is not subclass of TraversableOnce!")
+      }
   }
 }
 

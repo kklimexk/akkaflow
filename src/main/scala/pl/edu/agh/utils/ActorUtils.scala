@@ -1,12 +1,12 @@
 package pl.edu.agh.utils
 
-import akka.actor.{ActorSystem, ActorRef}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import akka.pattern.ask
-
 import pl.edu.agh.messages.Get
 import pl.edu.agh.workflow_processes.PatternActor
-import pl.edu.agh.workflow_processes.simple.{ProcessActor, Process}
+import pl.edu.agh.workflow_processes.discriminator.{Disc, DiscActor}
+import pl.edu.agh.workflow_processes.simple.{Process, ProcessActor}
 import pl.edu.agh.workflow_processes.synchronization.{Sync, SyncActor}
 
 import scala.concurrent.Await
@@ -37,6 +37,10 @@ object ActorUtils {
         Await.result(actorF, timeout.duration).asInstanceOf[ProcessActor[T, R]]
       }
 
+      def toDiscActor[T, R]: DiscActor[T, R] = {
+        Await.result(actorF, timeout.duration).asInstanceOf[DiscActor[T, R]]
+      }
+
       /*def out: List[Int] = {
         val actor = actorRef.toWorkflowProcess
         actor.out
@@ -50,5 +54,6 @@ object ActorUtils {
     }
     implicit def convertSyncToSyncActor[T, R](mSync: Sync[T, R]): SyncActor[T, R] = mSync.actor.toSyncActor
     implicit def convertProcessToProcessActor[T, R](merge: Process[T, R]): ProcessActor[T, R] = merge.actor.toProcessActor
+    implicit def convertDiscToDiscActor[T, R](disc: Disc[T, R]): DiscActor[T, R] = disc.actor.toDiscActor
   }
 }

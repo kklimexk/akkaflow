@@ -2,6 +2,7 @@ package pl.edu.agh.workflow_processes
 
 import akka.actor.ActorRef
 import pl.edu.agh.workflow.elements.Sink
+import scala.concurrent.duration._
 
 trait PatternOuts[R] { actor: PatternActor =>
   /**
@@ -11,13 +12,17 @@ trait PatternOuts[R] { actor: PatternActor =>
     var outsMap = Map.empty[String, ActorRef]
     if (actor.numOfOuts > 0) {
       for (i <- 0 until actor.numOfOuts) {
-        outsMap += (("out" + i) -> Sink[R]("out" + i, actor.context))
+        outsMap += (("out" + i) -> Sink[R]("out" + i, actor.context)(PatternOuts.stateTimeout))
       }
     } else if (actor._outputs.nonEmpty) {
-      outsMap = _outputs.map(o => o -> Sink[R](o, actor.context))(collection.breakOut)
+      outsMap = _outputs.map(o => o -> Sink[R](o, actor.context)(PatternOuts.stateTimeout))(collection.breakOut)
     }
     outsMap
   }
   def outs = _outs.values.toSeq
   def outs(name: String) = _outs(name)
+}
+
+object PatternOuts {
+  var stateTimeout = 1.seconds
 }

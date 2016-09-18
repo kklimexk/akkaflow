@@ -4,6 +4,7 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import akka.pattern.ask
 import pl.edu.agh.messages.Get
+import pl.edu.agh.workflow.elements.Sink
 import pl.edu.agh.workflow_processes.PatternActor
 import pl.edu.agh.workflow_processes.discriminator.{Disc, DiscActor}
 import pl.edu.agh.workflow_processes.simple.{Process, ProcessActor}
@@ -39,6 +40,10 @@ object ActorUtils {
 
       def toDiscActor[T, R]: DiscActor[T, R] = {
         Await.result(actorF, timeout.duration).asInstanceOf[DiscActor[T, R]]
+      }
+
+      def toSinkActor[R]: Sink[R] = {
+        Await.result(actorF, timeout.duration).asInstanceOf[Sink[R]]
       }
 
       /*def out: List[Int] = {

@@ -2,16 +2,9 @@ package pl.edu.agh.workflow.elements
 
 import akka.actor.{ActorContext, ActorLogging, FSM, Props}
 import pl.edu.agh.messages.{Get, GetGroupedOut, GetOut, ResultMessage}
+import pl.edu.agh.utils.FSMStates._
 
 import scala.concurrent.duration._
-
-sealed trait State
-case object Idle extends State
-case object Active extends State
-case object Init extends State
-
-case object Flush
-case object CheckState
 
 class Sink[R](stateTimeout: FiniteDuration) extends FSM[State, List[R]] with ActorLogging {
 

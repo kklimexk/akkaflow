@@ -5,51 +5,100 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import pl.edu.agh.workflow_processes.{PatternActor, PatternOuts}
 
 import scala.util.control.Breaks._
-import akka.actor.{ActorLogging, Props}
+import akka.actor.Props
+import com.typesafe.config.ConfigFactory
 import pl.edu.agh.actions.{IMultipleAction, Ins, Outs}
 import pl.edu.agh.messages._
+import pl.edu.agh.utils.FSMStates._
 
-class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var multipleAction: IMultipleAction[T, R], syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends PatternActor(numOfOuts, outs, multipleAction) with PatternOuts[R] with ActorLogging {
-  def receive = {
-    case SyncDataMessage(data: T, uId) =>
+import scala.concurrent.duration._
+
+class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var multipleAction: IMultipleAction[T, R], syncPoints: Seq[ConcurrentLinkedQueue[T]]) extends PatternActor(numOfOuts, outs, multipleAction) with PatternOuts[R] {
+
+  lazy val time = ConfigFactory.load().getInt("config.state.stateTimeout")
+
+  startWith(Init, Uninitialized)
+
+  when(Init) {
+    case Event(SyncDataMessage(data: T, uId), _) =>
       syncPoints(uId).offer(data)
       self ! GetResult
-
-    case GetResult =>
-
-      var canExecuteAction = true
-
-      breakable {
-        for (q <- syncPoints) {
-          val el = q.peek()
-          if (el == null) {
-            canExecuteAction = false
-            break
-          }
-        }
-      }
-
-      if (canExecuteAction) {
-        var sync = Map.empty[String, T]
-        if (ins.nonEmpty) {
-          for (i <- 0 until syncPoints.size) {
-            sync = sync + (ins(i) -> syncPoints(i).poll())
-          }
-        } else {
-          for (i <- 0 until syncPoints.size) {
-            sync = sync + (("in" + i) -> syncPoints(i).poll())
-          }
-        }
-        multipleAction.execute(Ins(sync))(Outs(_outs))
-      }
-    case ChangeAction(act: IMultipleAction[T, R]) =>
+      goto(Active)
+    case Event(GetResult, _) =>
+      executeGetResultEvent()
+      goto(Active)
+    case Event(ChangeAction(act: IMultipleAction[T, R]), _) =>
       multipleAction = act
-    /*case ChangeSendTo(outName) =>
-      sendTo = outName*/
-    case Get =>
-      sender ! this
+      goto(Active)
   }
 
+  when(Active) {
+    case Event(SyncDataMessage(data: T, uId), _) =>
+      syncPoints(uId).offer(data)
+      self ! GetResult
+      stay
+    case Event(GetResult, _) =>
+      executeGetResultEvent()
+      stay
+    case Event(ChangeAction(act: IMultipleAction[T, R]), _) =>
+      multipleAction = act
+      stay
+    case Event(Flush | StateTimeout, _) =>
+      goto(Idle)
+  }
+
+  when(Idle) {
+    case Event(SyncDataMessage(data: T, uId), _) =>
+      syncPoints(uId).offer(data)
+      self ! GetResult
+      goto(Active)
+    case Event(GetResult, _) =>
+      executeGetResultEvent()
+      goto(Active)
+    case Event(ChangeAction(act: IMultipleAction[T, R]), _) =>
+      multipleAction = act
+      goto(Active)
+  }
+
+  onTransition {
+    case _ -> Active => setTimer("stateTimeout", Flush, time.seconds)
+  }
+
+  whenUnhandled {
+    case Event(Get, _) =>
+      sender ! this
+      stay
+  }
+
+  private def executeGetResultEvent() = {
+    var canExecuteAction = true
+
+    breakable {
+      for (q <- syncPoints) {
+        val el = q.peek()
+        if (el == null) {
+          canExecuteAction = false
+          break
+        }
+      }
+    }
+
+    if (canExecuteAction) {
+      var sync = Map.empty[String, T]
+      if (ins.nonEmpty) {
+        for (i <- 0 until syncPoints.size) {
+          sync = sync + (ins(i) -> syncPoints(i).poll())
+        }
+      } else {
+        for (i <- 0 until syncPoints.size) {
+          sync = sync + (("in" + i) -> syncPoints(i).poll())
+        }
+      }
+      multipleAction.execute(Ins(sync))(Outs(_outs))
+    }
+  }
+
+  initialize()
 }
 
 object SyncActor {

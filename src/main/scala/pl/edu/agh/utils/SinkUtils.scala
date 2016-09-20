@@ -12,7 +12,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object SinkUtils {
-  lazy val awaitTime = ConfigFactory.load().getInt("sink.state.awaitTime")
+  lazy val awaitTime = ConfigFactory.load().getInt("config.state.awaitTime")
 
   def getResultsAsync[R](sink: ActorRef): Future[List[R]] = {
     import pl.edu.agh.utils.ActorUtils.Implicits._
@@ -20,7 +20,11 @@ object SinkUtils {
 
     def checkSinkState(sink: ActorRef, sinkActor: Sink[R]): Future[List[R]] = {
       val res = Future.successful(sinkActor.stateName).flatMap {
-        case Idle => (sink ? GetOut).mapTo[List[R]]
+        case Idle => (sink ? GetOut).flatMap {
+          case NotReady =>
+            akka.pattern.after(awaitTime milliseconds, using = system.scheduler)(checkSinkState(sink, sinkActor))
+          case result: List[R] => Future.successful(result)
+        }
         case activeOrInit @ (Active | Init) =>
           akka.pattern.after(awaitTime milliseconds, using = system.scheduler)(checkSinkState(sink, sinkActor))
       }
@@ -34,7 +38,11 @@ object SinkUtils {
 
     def checkSinkState(sink: ActorRef, sinkActor: Sink[R]): Future[Iterator[List[R]]] = {
       val res = Future.successful(sinkActor.stateName).flatMap {
-        case Idle => (sink ? GetGroupedOut(size)).mapTo[Iterator[List[R]]]
+        case Idle => (sink ? GetGroupedOut(size)).flatMap {
+          case NotReady =>
+            akka.pattern.after(awaitTime milliseconds, using = system.scheduler)(checkSinkState(sink, sinkActor))
+          case result: Iterator[List[R]] => Future.successful(result)
+        }
         case activeOrInit @ (Active | Init) =>
           akka.pattern.after(awaitTime milliseconds, using = system.scheduler)(checkSinkState(sink, sinkActor))
       }

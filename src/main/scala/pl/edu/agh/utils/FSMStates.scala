@@ -7,5 +7,11 @@ object FSMStates {
   case object Active extends State
   case object Init extends State
 
+  //-------------------------------
+
+  sealed trait Data
+  case object Uninitialized extends Data
+  case object NotReady extends Data
+
   case object Flush
 }

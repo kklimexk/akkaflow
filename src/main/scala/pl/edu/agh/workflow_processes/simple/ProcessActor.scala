@@ -1,21 +1,60 @@
 package pl.edu.agh.workflow_processes.simple
 
-import akka.actor.{ActorLogging, Props}
+import akka.actor.Props
+import com.typesafe.config.ConfigFactory
 import pl.edu.agh.actions.{ISingleAction, Outs}
 import pl.edu.agh.messages._
+import pl.edu.agh.utils.FSMStates._
 import pl.edu.agh.workflow_processes.{PatternActor, PatternOuts}
 
-class ProcessActor[T, R](numOfOuts: Int, outs: Seq[String], var _action: ISingleAction[T, R]) extends PatternActor(numOfOuts, outs, _action) with PatternOuts[R] with ActorLogging {
-  def receive = {
-    case DataMessage(data: T) =>
+import scala.concurrent.duration._
+
+class ProcessActor[T, R](numOfOuts: Int, outs: Seq[String], var _action: ISingleAction[T, R]) extends PatternActor(numOfOuts, outs, _action) with PatternOuts[R] {
+
+  lazy val time = ConfigFactory.load().getInt("config.state.stateTimeout")
+
+  startWith(Init, Uninitialized)
+
+  when(Init) {
+    case Event(DataMessage(data: T), _) =>
       _action.execute(data)(Outs(_outs))
-    case ChangeAction(act: ISingleAction[T, R]) =>
+      goto(Active)
+    case Event(ChangeAction(act: ISingleAction[T, R]), _) =>
       _action = act
-    /*case ChangeSendTo(outName) =>
-      sendTo = outName*/
-    case Get =>
-      sender ! this
+      goto(Active)
   }
+
+  when(Active) {
+    case Event(DataMessage(data: T), _) =>
+      _action.execute(data)(Outs(_outs))
+      stay
+    case Event(ChangeAction(act: ISingleAction[T, R]), _) =>
+      _action = act
+      stay
+    case Event(Flush | StateTimeout, _) =>
+      goto(Idle)
+  }
+
+  when(Idle) {
+    case Event(DataMessage(data: T), _) =>
+      _action.execute(data)(Outs(_outs))
+      goto(Active)
+    case Event(ChangeAction(act: ISingleAction[T, R]), _) =>
+      _action = act
+      goto(Active)
+  }
+
+  onTransition {
+    case _ -> Active => setTimer("stateTimeout", Flush, time.seconds)
+  }
+
+  whenUnhandled {
+    case Event(Get, _) =>
+      sender ! this
+      stay
+  }
+
+  initialize()
 }
 
 object ProcessActor {

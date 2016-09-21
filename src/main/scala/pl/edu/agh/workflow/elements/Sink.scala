@@ -20,23 +20,22 @@ class Sink[R](stateTimeout: FiniteDuration) extends FSM[State, List[R]] {
       goto(Active) using (out :+ data)
   }
 
-  when(Active) {
+  when(Active, stateTimeout = stateTimeout) {
     case Event(ResultMessage(data: R), out) =>
       //println("out result message: " + out + " actor: " + self.path)
-      stay using (out :+ data)
+      stay using (out :+ data) forMax stateTimeout
     case Event(Flush | StateTimeout, out) =>
       //println("out flush: " + out + " actor: " + self.path)
       parent.stateName match {
         case Idle => goto(Idle) using out
-        case activeOrInit @ (Active | Init) =>
-          setTimer("stateTimeout", Flush, stateTimeout); stay using out
+        case activeOrInit @ (Active | Init) => stay using out forMax stateTimeout
       }
     case Event(GetOut, out) =>
       sender ! NotReady
-      stay using out
+      stay using out forMax stateTimeout
     case Event(GetGroupedOut(size), out) =>
       sender ! NotReady
-      stay using out
+      stay using out forMax stateTimeout
   }
 
   when(Idle) {
@@ -52,10 +51,6 @@ class Sink[R](stateTimeout: FiniteDuration) extends FSM[State, List[R]] {
       val o = out
       sender ! o.grouped(size)
       stay using out
-  }
-
-  onTransition {
-    case _ -> Active => setTimer("stateTimeout", Flush, stateTimeout)
   }
 
   whenUnhandled {

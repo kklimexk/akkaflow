@@ -24,13 +24,13 @@ class ProcessActor[T, R](numOfOuts: Int, outs: Seq[String], var _action: ISingle
       goto(Active)
   }
 
-  when(Active) {
+  when(Active, stateTimeout = time.seconds) {
     case Event(DataMessage(data: T), _) =>
       _action.execute(data)(Outs(_outs))
-      stay
+      stay forMax time.seconds
     case Event(ChangeAction(act: ISingleAction[T, R]), _) =>
       _action = act
-      stay
+      stay forMax time.seconds
     case Event(Flush | StateTimeout, _) =>
       goto(Idle)
   }
@@ -42,10 +42,6 @@ class ProcessActor[T, R](numOfOuts: Int, outs: Seq[String], var _action: ISingle
     case Event(ChangeAction(act: ISingleAction[T, R]), _) =>
       _action = act
       goto(Active)
-  }
-
-  onTransition {
-    case _ -> Active => setTimer("stateTimeout", Flush, time.seconds)
   }
 
   whenUnhandled {

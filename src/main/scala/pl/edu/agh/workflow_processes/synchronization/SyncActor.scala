@@ -32,17 +32,17 @@ class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var m
       goto(Active)
   }
 
-  when(Active) {
+  when(Active, stateTimeout = time.seconds) {
     case Event(SyncDataMessage(data: T, uId), _) =>
       syncPoints(uId).offer(data)
       self ! GetResult
-      stay
+      stay forMax time.seconds
     case Event(GetResult, _) =>
       executeGetResultEvent()
-      stay
+      stay forMax time.seconds
     case Event(ChangeAction(act: IMultipleAction[T, R]), _) =>
       multipleAction = act
-      stay
+      stay forMax time.seconds
     case Event(Flush | StateTimeout, _) =>
       goto(Idle)
   }
@@ -58,10 +58,6 @@ class SyncActor[T, R](numOfOuts: Int, ins: Seq[String], outs: Seq[String], var m
     case Event(ChangeAction(act: IMultipleAction[T, R]), _) =>
       multipleAction = act
       goto(Active)
-  }
-
-  onTransition {
-    case _ -> Active => setTimer("stateTimeout", Flush, time.seconds)
   }
 
   whenUnhandled {
